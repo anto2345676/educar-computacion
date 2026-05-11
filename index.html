@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma estudiantil</title>
+    <meta charset="UTF-8">
+    <title>Plataforma Estudiantil</title>
+    <link rel="stylesheet" href="CSS/estili.CSS">
+    <!-- Imagen en la pestaña (favicon) -->
+    <link rel="icon" href="favicon.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+</head>
+<body>
+    <div class="contenedor">
+
+    <!-- Imagen representativa de la plataforma -->
+    <img src="img/logo.avif" alt="Logo Plataforma" class="logo">
+
+    <h2>Bienvenido</h2>
+
+    <!-- Campo de texto -->
+    <input type="text" id="nombre" placeholder="Ingresa tu nombre">
+
+    <h3>Selecciona un avatar</h3>
+
+    <!-- Avatares -->
+    <div class="avatares">
+        <img src="img/imagen1.png" onclick="seleccionar(this)">
+        <img src="img/imagen2.png" onclick="seleccionar(this)">
+        <img src="img/imagen3.png" onclick="seleccionar(this)">
+        <img src="img/imagen4.png" onclick="seleccionar(this)">
+        <img src="img/imagen5.png" onclick="seleccionar(this)">
+        <img src="img/imagen6.png" onclick="seleccionar(this)">
+    </div>
+
+    <!-- Botón -->
+    <button onclick="ingresar()">Ingresar</button>
+
+</div>
+<audio id="audioAvatar" src="sonidos/click.mp3"></audio>
+<audio id="audioFelicidades" src="c:\Users\user\Downloads\celebrar.mp3"></audio>
+    <script src="js/script.js"></script>
+
+</body>
+</html>
