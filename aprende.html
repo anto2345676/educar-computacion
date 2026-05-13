@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Aprende a Sumar! 🧮</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>¡Aprende a Sumar! 🧮</h1>
+        <p class="instruccion">Resuelve la operación y escribe tu respuesta</p>
+
+        <div class="operacion">
+            <span id="numero1">5</span>
+            <span class="signo">+</span>
+            <span id="numero2">3</span>
+            <span class="signo">=</span>
+            <input type="number" id="respuesta" placeholder="?" min="0">
+        </div>
+
+        <div class="botones">
+            <button id="verificar">Comprobar Respuesta</button>
+            <button id="nuevaOperacion">Nueva Operación</button>
+        </div>
+
+        <div id="mensaje" class="mensaje"></div>
+    </div>
+
+    <script src="javascript.js"></script>
+</body>
+</html>
