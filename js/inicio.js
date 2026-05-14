@@ -18,11 +18,6 @@ window.addEventListener("DOMContentLoaded", () => {
 function mensajeVoz() {
     // Texto que se va a decir
     let texto = "¡Excelente! Continuemos con las actividades";
-
-//  FUNCIÓN NUEVA: Mensaje de voz
-function mensajeVoz() {
-    // Texto que se va a decir
-    let texto = "¡Excelente! Continuemos con las actividades";
     
     // Crear objeto de síntesis de voz
     let hablar = new SpeechSynthesisUtterance();
@@ -34,9 +29,7 @@ function mensajeVoz() {
 
     // Ejecutar la voz
     window.speechSynthesis.speak(hablar);
-}}
-setTimeout(() => {
-
+    
         window.location.href = "aprende.html";
 
-    }, 2000);
+    }
