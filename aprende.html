@@ -8,24 +8,34 @@
 </head>
 <body>
     <div class="contenedor">
-        <h1>¡Aprende a Sumar! 🧮</h1>
-        <p class="instruccion">Resuelve la operación y escribe tu respuesta</p>
+    <h1>¡Aprende a Sumar!</h1>
+    
+    <div class="pizarra">
+        <!-- Parte de los 4 círculos -->
+        <div class="grupo" onclick="contar(4)">
+            <div class="circulo"></div><div class="circulo"></div>
+            <div class="circulo"></div><div class="circulo"></div>
+        </div>
+        
+        <span class="signo">+</span>
 
-        <div class="operacion">
-            <span id="numero1">5</span>
-            <span class="signo">+</span>
-            <span id="numero2">3</span>
-            <span class="signo">=</span>
-            <input type="number" id="respuesta" placeholder="?" min="0">
+        <!-- Parte de los 3 círculos -->
+        <div class="grupo" onclick="contar(3)">
+            <div class="circulo"></div><div class="circulo"></div>
+            <div class="circulo"></div>
         </div>
 
-        <div class="botones">
-            <button id="verificar">Comprobar Respuesta</button>
-            <button id="nuevaOperacion">Nueva Operación</button>
-        </div>
+        <span class="signo">=</span>
 
-        <div id="mensaje" class="mensaje"></div>
+        <!-- Resultado -->
+        <div class="grupo">
+            <div class="circulo azul"></div><div class="circulo azul"></div>
+            <div class="circulo azul"></div><div class="circulo azul"></div>
+            <div class="circulo azul"></div><div class="circulo azul"></div>
+            <div class="circulo azul"></div>
+        </div>
     </div>
+</div>
 
     <script src="javascript.js"></script>
 </body>
