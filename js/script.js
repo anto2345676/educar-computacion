@@ -41,7 +41,7 @@ function ingresar() {
     if (nombre === "" && avatarSeleccionado === null) {
 
         let voz = new SpeechSynthesisUtterance(
-        hablar ("Debes escribir tu nombre e ingresar un avatar") 
+        ("Debes escribir tu nombre e ingresar un avatar") 
         );
 
         voz.lang = "es-ES";
@@ -57,7 +57,7 @@ function ingresar() {
     if (nombre === "") {
 
         let voz = new SpeechSynthesisUtterance(
-            hablar ("Debes escribir tu nombre") 
+            ("Debes escribir tu nombre") 
         );
 
         voz.lang = "es-ES";
