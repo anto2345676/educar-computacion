@@ -25,6 +25,8 @@ function mensajeVoz() {
     hablar.lang = "es-ES";
     
     window.speechSynthesis.speak(hablar);
+    localStorage.setItem("nombre", nombre);
+localStorage.setItem("avatarUsuario", avatarSeleccionado);
 
     // Esperar un poco a que termine de hablar antes de cambiar de página
     setTimeout(() => {
