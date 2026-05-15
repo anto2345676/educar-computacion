@@ -1,0 +1,134 @@
+
+body {
+    background-color: #e0f7fa; /* Un azul muy claro y relajante */
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Fuente amigable para niños */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.contenedor {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 800px;
+}
+
+h1 {
+    color: #00796b;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.instruccion {
+    color: #555;
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+/* Área de la Operación Visual */
+.pizarra {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #fffde7; /* Color crema tipo hoja de papel */
+    padding: 30px;
+    border: 4px dashed #ffd54f;
+    border-radius: 20px;
+    margin-bottom: 30px;
+}
+
+.grupo {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Organiza los círculos en 2 columnas */
+    gap: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border-radius: 15px;
+}
+
+.grupo:hover {
+    transform: scale(1.1);
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Estilo de los Círculos (puedes cambiarlos por lápices con una imagen) */
+.circulo {
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, #ff7043, #d84315); /* Naranja con volumen */
+    border-radius: 50%;
+    box-shadow: 0 4px 0 #bf360c; /* Efecto 3D */
+}
+
+.circulo.azul {
+    background: radial-gradient(circle, #4fc3f7, #0288d1); /* Azul para el resultado */
+    box-shadow: 0 4px 0 #01579b;
+}
+
+.signo {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Inputs y Botones */
+#respuesta {
+    width: 80px;
+    font-size: 2rem;
+    text-align: center;
+    border: 3px solid #4caf50;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.botones {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+button {
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    color: white;
+}
+
+#verificar {
+    background-color: #4caf50;
+    box-shadow: 0 5px 0 #388e3c;
+}
+
+#verificar:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #388e3c;
+}
+
+#nuevaOperacion {
+    background-color: #2196f3;
+    box-shadow: 0 5px 0 #1976d2;
+}
+
+#nuevaOperacion:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #1976d2;
+}
+
+.mensaje {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    min-height: 30px;
+}
