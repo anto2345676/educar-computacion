@@ -13,34 +13,26 @@
 
 </head>
 <body>
-    <div class="contenedor">
-
-    <!-- Imagen representativa de la plataforma -->
-    <img src="img/logo.avif" alt="Logo Plataforma" class="logo">
-
-    <h2>Bienvenido</h2>
-
-    <!-- Campo de texto -->
-    <input type="text" id="nombre" placeholder="Ingresa tu nombre">
-
-    <h3>Selecciona un avatar</h3>
-
-    <!-- Avatares -->
-    <div class="avatares">
-        <img src="img/imagen1.png" onclick="seleccionar(this)">
-        <img src="img/imagen2.png" onclick="seleccionar(this)">
-        <img src="img/imagen3.png" onclick="seleccionar(this)">
-        <img src="img/imagen4.png" onclick="seleccionar(this)">
-        <img src="img/imagen5.png" onclick="seleccionar(this)">
-        <img src="img/imagen6.png" onclick="seleccionar(this)">
+    <div id="pantalla1" class="container">
+    <div class="logo">🌟 APRENDE JUGANDO</div>
+    
+    <label>Tu Nombre:</label>
+    <input type="text" id="inputNombre" placeholder="Escribe aquí...">
+    
+    <p>Selecciona tu Avatar:</p>
+    <div class="avatar-grid">
+        <div class="avatar" onclick="selectAvatar(this, '🦁')">🦁</div>
+        <div class="avatar" onclick="selectAvatar(this, '🦊')">🦊</div>
+        <div class="avatar" onclick="selectAvatar(this, '🤖')">🤖</div>
+        <div class="avatar" onclick="selectAvatar(this, '🦄')">🦄</div>
+        <div class="avatar" onclick="selectAvatar(this, '🐼')">🐼</div>
+        <div class="avatar" onclick="selectAvatar(this, '🦖')">🦖</div>
     </div>
 
-    <!-- Botón -->
-    <button onclick="ingresar()">Ingresar</button>
-
+    <button onclick="validarIngreso()">Ingresar</button>
+    <p id="mensajeError" class="error"></p>
 </div>
-<audio id="audioAvatar" src="sonidos/click.mp3"></audio>
-    <audio id="audioFelicidades" src="sonidos/celebrar.mp3">
+   
     <script src="js/script.js"></script>
 
 </body>
