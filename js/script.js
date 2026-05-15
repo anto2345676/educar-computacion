@@ -1,50 +1,29 @@
 let avatarSeleccionado = null;
 
 function seleccionar(img) {
+    // 1. Manejo visual de la selección
     let avatares = document.querySelectorAll('.avatares img');
     avatares.forEach(a => a.classList.remove('seleccionado'));
     img.classList.add('seleccionado');
 
-    avatarSeleccionado = img.src; // Guardamos la URL de la imagen
+    // 2. Guardar la ruta de la imagen
+    avatarSeleccionado = img.src;
 
-    // Sonido y Voz
-    document.getElementById("audioAvatar").play();
+    // 3. Sonido de click (opcional, asegúrate que la ruta sea correcta)
+    const sonido = document.getElementById("audioAvatar");
+    if (sonido) {
+        sonido.currentTime = 0; // Reinicia el sonido si haces click rápido
+        sonido.play().catch(e => console.log("Sonido bloqueado hasta interacción"));
+    }
+
+    // 4. COMANDO DE VOZ (Lo que te faltaba)
+    // Cancelamos cualquier voz anterior para que no se amontonen
+    window.speechSynthesis.cancel(); 
+
     let mensaje = new SpeechSynthesisUtterance("Avatar seleccionado");
     mensaje.lang = "es-ES";
-    speechSynthesis.speak(mensaje);
-}
-
-function ingresar() {
-    let nombre = document.getElementById('nombre').value.trim();
-    let textoVoz = "";
-
-    // Validaciones
-    if (nombre === "" && avatarSeleccionado === null) {
-        textoVoz = "Debes escribir tu nombre y seleccionar un avatar";
-    } else if (nombre === "") {
-        textoVoz = "Debes escribir tu nombre";
-    } else if (avatarSeleccionado === null) {
-        textoVoz = "Seleccione un avatar";
-    }
-
-    if (textoVoz !== "") {
-        let voz = new SpeechSynthesisUtterance(textoVoz);
-        voz.lang = "es-ES";
-        speechSynthesis.speak(voz);
-        return;
-    }
-
-    // SI TODO ESTÁ BIEN: Guardar en el navegador
-    localStorage.setItem("nombre", nombre);
-    localStorage.setItem("avatarUsuario", avatarSeleccionado);
-
-    let vozExito = new SpeechSynthesisUtterance("Bien hecho " + nombre);
-    vozExito.lang = "es-ES";
-    speechSynthesis.speak(vozExito);
-
-    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-
-    setTimeout(() => {
-        window.location.href = "inicio.html";
-    }, 2000);
+    mensaje.rate = 1; // Velocidad normal
+    mensaje.pitch = 1.2; // Un toque más agudo para que sea amigable
+    
+    window.speechSynthesis.speak(mensaje);
 }
