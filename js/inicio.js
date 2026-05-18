@@ -5,32 +5,33 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (nombreGuardado) {
         document.getElementById("nombreUsuario").textContent = nombreGuardado;
+    } else {
+        document.getElementById("nombreUsuario").textContent = "Invitado";
     }
 
     if (avatarGuardado) {
         document.getElementById("avatarUsuario").src = avatarGuardado;
+    } else {
+        document.getElementById("avatarUsuario").alt = "Sin avatar seleccionado";
     }
-
-    // Voz automática al entrar
-    setTimeout(() => {
-        let bienvenida = new SpeechSynthesisUtterance("Bienvenido " + (nombreGuardado || "amigo"));
-        bienvenida.lang = "es-ES";
-        window.speechSynthesis.speak(bienvenida);
-    }, 500);
 });
-
 function mensajeVoz() {
+    // Texto que se va a decir
     let texto = "¡Excelente! Continuemos con las actividades";
-    let hablar = new SpeechSynthesisUtterance(texto);
-    hablar.lang = "es-ES";
     
-    window.speechSynthesis.speak(hablar);
-    localStorage.setItem("nombre", nombre);
-localStorage.setItem("avatarUsuario", avatarSeleccionado);
+    // Crear objeto de síntesis de voz
+    let hablar = new SpeechSynthesisUtterance();
+    hablar.text = texto;
+    hablar.lang = "es-ES"; // Idioma: Español
+    hablar.volume = 1;     // Volumen (0 a 1)
+    hablar.rate = 1;      // Velocidad (1 = normal)
+    hablar.pitch = 1.2;   // Tono de voz (más alto o más grave)
 
-    // Esperar un poco a que termine de hablar antes de cambiar de página
-    setTimeout(() => {
-        window.location.href = "aprende.html";
-    }, 2000);
+    // Ejecutar la voz
+    window.speechSynthesis.speak(hablar);
 }
-    
+setTimeout(() => {
+
+        window.location.href = "aprende.html";
+
+    }, 2000);

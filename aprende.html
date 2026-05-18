@@ -3,40 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Aprende a Sumar! 🧮</title>
+    <title>Aprender a contar del 1 al 5</title>
+    <!-- Enlace al archivo de estilos -->
     <link rel="stylesheet" href="CSS/aprende.CSS">
 </head>
 <body>
-    <div class="contenedor">
-    <h1>¡Aprende a Sumar!</h1>
-    
-    <div class="pizarra">
-        <!-- Parte de los 4 círculos -->
-        <div class="grupo" onclick="contar(4)">
-            <div class="circulo"></div><div class="circulo"></div>
-            <div class="circulo"></div><div class="circulo"></div>
-        </div>
-        
-        <span class="signo">+</span>
-
-        <!-- Parte de los 3 círculos -->
-        <div class="grupo" onclick="contar(3)">
-            <div class="circulo"></div><div class="circulo"></div>
-            <div class="circulo"></div>
-        </div>
-
-        <span class="signo">=</span>
-
-        <!-- Resultado -->
-        <div class="grupo">
-            <div class="circulo azul"></div><div class="circulo azul"></div>
-            <div class="circulo azul"></div><div class="circulo azul"></div>
-            <div class="circulo azul"></div><div class="circulo azul"></div>
-            <div class="circulo azul"></div>
-        </div>
+    <!-- Información del usuario -->
+    <div class="info-usuario">
+        <img id="avatarUsuario" src="" alt="Sin avatar seleccionado">
+        <span id="nombreUsuario">Invitado</span>
     </div>
-</div>
 
-    <script src="js/apende.js"></script>
+    <!-- Pantalla 1: Números del 1 al 5 -->
+    <div class="pantalla activa" id="pantalla1">
+        <h2>Aprendamos a contar: del 1 al 5</h2>
+        <div class="numeros-container">
+            <div class="numero-figura" data-numero="1">1</div>
+            <div class="numero-figura" data-numero="2">2</div>
+            <div class="numero-figura" data-numero="3">3</div>
+            <div class="numero-figura" data-numero="4">4</div>
+            <div class="numero-figura" data-numero="5">5</div>
+<!-- ... y así con todos los números que necesites -->
+        </div>
+        <button class="boton-siguiente" id="btnSiguiente1">Siguiente</button>
+    </div>
+
+    <!-- Pantalla 2: Nueva sección -->
+    <div class="pantalla" id="pantalla2">
+        <h2>¡Muy bien! Pasemos a más números</h2>
+    </div>
+
+    <!-- Enlace al archivo de JavaScript -->
+    <script src="aprende.js"></script>
 </body>
 </html>
