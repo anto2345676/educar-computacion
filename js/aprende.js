@@ -1,5 +1,5 @@
-// 📌 Evento principal
-window.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener("DOMContentLoaded", () => {
+    // 1. Cargar datos del alumno desde el localStorage
     const nombreGuardado = localStorage.getItem("nombre");
     const avatarGuardado = localStorage.getItem("avatarUsuario");
 
@@ -13,140 +13,106 @@ window.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("avatarUsuario").src = avatarGuardado;
     } else {
         const avatarEl = document.getElementById("avatarUsuario");
-        if (avatarEl) avatarEl.alt = "Sin avatar seleccionado";
+        if (avatarEl) avatarEl.alt = "Sin avatar";
     }
 
-    // Cargamos voces al inicio
-    await inicializarVoces();
-    inicializarNumeros();
-    inicializarBotonSiguiente();
+    // 2. Comando de voz automático al entrar: "Empecemos la actividad"
+    setTimeout(() => {
+        hablar("¡Empecemos la actividad!");
+    }, 600);
+
+    // 3. Inicializar el sistema interactivo de arrastrar y soltar
+    inicializarDragAndDrop();
 });
 
-// 📌 CARGAR VOCES: Versión optimizada
-function inicializarVoces() {
-    return new Promise((resolve) => {
-        const voces = window.speechSynthesis.getVoices();
-        if (voces.length > 0) {
-            resolve(voces);
-            return;
-        }
-
-        // Si no están listas, escuchamos el evento
-        window.speechSynthesis.onvoiceschanged = () => {
-            resolve(window.speechSynthesis.getVoices());
-        };
-
-        // Respaldo por si onvoiceschanged no se dispara (Chrome/Safari viejo)
-        setTimeout(() => {
-            resolve(window.speechSynthesis.getVoices());
-        }, 500);
-    });
+// Función global de voz
+function hablar(texto) {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel(); // Limpia cualquier voz en cola
+    
+    let hablarUtterance = new SpeechSynthesisUtterance(texto);
+    hablarUtterance.lang = "es-ES";
+    hablarUtterance.rate = 0.9; // Velocidad pausada para niños
+    window.speechSynthesis.speak(hablarUtterance);
 }
 
-// 📌 BUSCA VOZ EN ESPAÑOL
-function obtenerVozEspanol() {
-    const voces = window.speechSynthesis.getVoices();
-    return voces.find(voz => voz.lang.startsWith('es')) 
-        || voces.find(voz => voz.name.toLowerCase().includes('spanish') || voz.name.toLowerCase().includes('español'));
+// Acción del botón parlante
+function reproducirInstrucciones() {
+    hablar("Debes deslizar los números a su casilla correspondiente.");
 }
 
-// ✅ MENSAJE DEL BOTÓN SIGUIENTE (Ahora acepta un Callback para saber cuándo termina)
-function mensajeVoz(onTerminado) { 
-    if (!('speechSynthesis' in window)) {
-        alert('Tu navegador no soporta voz');
-        if (onTerminado) onTerminado();
-        return;
-    }
+// Lógica de Arrastrar y soltar
+function inicializarDragAndDrop() {
+    const arrastrables = document.querySelectorAll('.numero-arrastrable');
+    const destinos = document.querySelectorAll('.destino');
+    const contenedorOpciones = document.getElementById('contenedor-opciones');
 
-    // Cancelamos cualquier audio previo que pueda estar colgado
-    window.speechSynthesis.cancel();
+    arrastrables.forEach(elemento => {
+        // Al empezar a arrastrar dice el número correspondiente
+        elemento.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', e.target.id);
+            hablar(e.target.dataset.val);
+        });
 
-    let texto = "¡Excelente! Continuemos con las actividades";
-    let hablar = new SpeechSynthesisUtterance(texto);
-    hablar.lang = "es-ES";
-    hablar.volume = 1;
-    hablar.rate = 0.9; 
-    hablar.pitch = 1; 
-
-    const vozElegida = obtenerVozEspanol();
-    if (vozElegida) hablar.voice = vozElegida;
-
-    // 🔥 ESTO ES CLAVE: Ejecuta la acción SOLO cuando termine de hablar
-    hablar.onend = () => {
-        if (onTerminado) onTerminado();
-    };
-
-    // En caso de error, que no se quede trabada la app
-    hablar.onerror = () => {
-        if (onTerminado) onTerminado();
-    };
-
-    window.speechSynthesis.speak(hablar);
-}
-
-// ✅ FUNCIÓN PRINCIPAL: DECIR NÚMERO
-function hablarNumero(numero) {
-    if (!('speechSynthesis' in window)) {
-        alert('Tu navegador no soporta voz');
-        return;
-    }
-
-    window.speechSynthesis.cancel(); // Limpia colas previas inmediatamente
-
-    const mensaje = new SpeechSynthesisUtterance(`El número es ${numero}`);
-    mensaje.lang = 'es-ES';
-    mensaje.rate = 0.9; 
-    mensaje.volume = 1;
-
-    const vozElegida = obtenerVozEspanol();
-    if (vozElegida) mensaje.voice = vozElegida;
-
-    window.speechSynthesis.speak(mensaje);
-}
-
-// ACTIVAR CLIC EN NÚMEROS
-function inicializarNumeros() {
-    const figurasNumeros = document.querySelectorAll('.numero-figura');
-
-    if (figurasNumeros.length === 0) {
-        console.warn('No hay elementos con la clase .numero-figura');
-        return;
-    }
-
-    figurasNumeros.forEach(figura => {
-        figura.removeEventListener('click', manejarClic);
-        figura.addEventListener('click', manejarClic);
-    });
-}
-
-function manejarClic() {
-    const numero = this.getAttribute('data-numero');
-    if (numero) {
-        hablarNumero(numero);
-    }
-}
-
-// BOTÓN SIGUIENTE REESTRUCTURADO
-function inicializarBotonSiguiente() {
-    const btnSiguiente1 = document.getElementById('btnSiguiente1');
-    const pantalla1 = document.getElementById('pantalla1');
-    const pantalla2 = document.getElementById('pantalla2');
-
-    if (!btnSiguiente1 || !pantalla1 || !pantalla2) {
-        console.warn('Faltan elementos en el HTML');
-        return;
-    }
-
-    btnSiguiente1.addEventListener('click', () => {
-        pantalla1.classList.remove('activa');
-        pantalla2.classList.add('activa');
-        
-        // 1. Abrimos la ventana inmediatamente (requiere interacción directa del clic)
-        window.open('ventana_nueva.html', '_blank', 'width=500,height=400,top=100,left=100');
-
-        // 2. Ejecutamos la voz y pasamos la redirección como el "Callback" (lo que hará al terminar)
-        mensajeVoz(() => {
-            window.location.href = "aprende.html";
+        // Al hacer clic o tocar también dice el número
+        elemento.addEventListener('click', (e) => {
+            hablar(e.target.dataset.val);
         });
     });
+
+    destinos.forEach(destino => {
+        destino.addEventListener('dragover', (e) => e.preventDefault());
+
+        destino.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const idElemento = e.dataTransfer.getData('text');
+            const elementoArrastrado = document.getElementById(idElemento);
+            
+            if (elementoArrastrado && destino.children.length === 0) {
+                destino.appendChild(elementoArrastrado);
+                // Vuelve a confirmar el número al colocarlo en la casilla
+                hablar(elementoArrastrado.dataset.val);
+            }
+        });
+    });
+
+    // Permitir devolver los números a la caja de abajo
+    if (contenedorOpciones) {
+        contenedorOpciones.addEventListener('dragover', (e) => e.preventDefault());
+        contenedorOpciones.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const idElemento = e.dataTransfer.getData('text');
+            const elementoArrastrado = document.getElementById(idElemento);
+            if (elementoArrastrado) {
+                contenedorOpciones.appendChild(elementoArrastrado);
+            }
+        });
+    }
+}
+
+// Validación de la actividad al presionar el botón
+function validarActividad() {
+    let aciertos = 0;
+    const casillasDestino = ['target-2', 'target-4', 'target-5'];
+    const divMensaje = document.getElementById('mensaje');
+
+    casillasDestino.forEach(id => {
+        const casilla = document.getElementById(id);
+        const numeroCorrecto = casilla.dataset.numero;
+        
+        // Comprobar si la casilla contiene el número esperado
+        if (casilla.firstElementChild && casilla.firstElementChild.dataset.val === numeroCorrecto) {
+            aciertos++;
+        }
+    });
+
+    if (aciertos === 3) {
+        divMensaje.className = "correcto";
+        divMensaje.innerText = "¡Excelente! Lo hiciste increíble. 🎉";
+        hablar("¡Excelente! Lo hiciste increíble.");
+    } else {
+        divMensaje.className = "incorrecto";
+        divMensaje.innerText = "¡Oh, casi! Revisa bien los números e inténtalo de nuevo. 💪";
+        hablar("¡Oh, casi! Revisa bien los números e inténtalo de nuevo.");
+    }
 }
