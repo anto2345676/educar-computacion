@@ -3,37 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aprender a contar del 1 al 5</title>
-    <!-- Enlace al archivo de estilos -->
-    <link rel="stylesheet" href="CSS/aprende.CSS">
+    <title>¡Aprende los Números del 1 al 5</title>
+    <style>
+        /* ========== ESTILOS BASE COMPARTIDOS ========== */
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            background-color: #0088ff; /* Tu fondo azul clásico */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            user-select: none;
+        }
+
+        /* ========== USUARIO (Nombre y Avatar) ========== */
+        .info-usuario {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #df6161; /* Tu fondo rojo/naranja */
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+            font-weight: bold;
+        }
+
+        .info-usuario img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* ========== PANTALLAS / VISTAS ========== */
+        .pantalla {
+            background-color: #b4edff; /* Fondo celeste de tarjeta */
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+
+        /* ========== CONTENEDOR DE NÚMEROS ========== */
+        .numeros-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* ========== FIGURAS DE LOS NÚMEROS ========== */
+        .numero-figura {
+            width: 80px;
+            height: 80px;
+            background-color: #0099ff; /* Azul de botones */
+            color: #ffffff; /* Texto blanco */
+            border-radius: 10px; /* Esquinas redondas */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px rgba(0,0,0,0.1);
+        }
+
+        .numero-figura:hover {
+            transform: scale(1.1);
+            background-color: #2980b9; /* Azul más oscuro al pasar el mouse */
+        }
+
+        .numero-figura:active {
+            transform: scale(0.95);
+        }
+
+        /* ========== BOTÓN SIGUIENTE ========== */
+        .boton-siguiente {
+            background-color: #27ae60; /* Verde */
+            color: #ffffff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+        .boton-siguiente:hover {
+            background-color: #219653; /* Verde oscuro */
+        }
+    </style>
 </head>
 <body>
-    <!-- Información del usuario -->
+
     <div class="info-usuario">
-        <img id="avatarUsuario" src="" alt="Sin avatar seleccionado">
-        <span id="nombreUsuario">Invitado</span>
+        <img id="avatarUsuario" src="" alt="Avatar">
+        <span id="nombreUsuario">Jugador</span>
     </div>
 
-    <!-- Pantalla 1: Números del 1 al 5 -->
-    <div class="pantalla activa" id="pantalla1">
-        <h2>Aprendamos a contar: del 1 al 5</h2>
+    <div class="pantalla">
+        <h2>¡Presiona los números para escuchar!</h2>
+
         <div class="numeros-container">
             <div class="numero-figura" data-numero="1">1</div>
             <div class="numero-figura" data-numero="2">2</div>
             <div class="numero-figura" data-numero="3">3</div>
             <div class="numero-figura" data-numero="4">4</div>
             <div class="numero-figura" data-numero="5">5</div>
-<!-- ... y así con todos los números que necesites -->
         </div>
-        <button class="boton-siguiente" id="btnSiguiente1">Siguiente</button>
+
+        <button class="boton-siguiente" onclick="irAlJuego()">Siguiente</button>
     </div>
 
-    <!-- Pantalla 2: Nueva sección -->
-    <div class="pantalla" id="pantalla2">
-        <h2>¡Muy bien! Pasemos a más números</h2>
-    </div>
-
-    <!-- Enlace al archivo de JavaScript -->
-    <script src="aprende.js"></script>
+    <script src="js/aprende.js"></script>
 </body>
 </html>

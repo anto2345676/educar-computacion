@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Aprende a Contar del 6 al 10!</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Arial Round', 'Comic Sans MS', sans-serif;
+            background-color: #f3e5f5; /* Un color lila pastel diferente para variar el nivel */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            user-select: none;
+        }
+
+        .contenedor-juego {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 550px;
+            width: 90%;
+        }
+
+        .header-usuario {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #f3e5f5;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+
+        .avatar-mini {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #a25afd;
+            object-fit: cover;
+        }
+
+        h1 {
+            color: #7b1fa2;
+            font-size: 2.3rem;
+            text-shadow: 2px 2px #fff;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        /* Botón de Parlante */
+        .btn-parlante {
+            background-color: #ffeb3b;
+            border: 4px solid #fbc02d;
+            border-radius: 50%;
+            font-size: 2.2rem;
+            cursor: pointer;
+            width: 65px;
+            height: 65px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px #fbc02d;
+            transition: all 0.1s;
+            margin-bottom: 20px;
+        }
+
+        .btn-parlante:active {
+            box-shadow: 0 1px #fbc02d;
+            transform: translateY(3px);
+        }
+
+        /* Contenedor de la secuencia */
+        .secuencia-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .casilla {
+            width: 75px;
+            height: 75px;
+            background-color: #fff;
+            border: 4px dashed #b0bec5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #37474f;
+        }
+
+        .casilla.fijo {
+            background-color: #ba68c8; /* Color morado suave para los números fijos */
+            border-style: solid;
+            border-color: #7b1fa2;
+            color: white;
+        }
+
+        /* Contenedor de números para arrastrar */
+        .opciones-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            min-height: 85px;
+            background: #fdf6ff;
+            padding: 10px;
+            border-radius: 12px;
+            border: 2px dashed #e1bee7;
+        }
+
+        .numero-arrastrable {
+            width: 75px;
+            height: 75px;
+            background-color: #ff7043;
+            border: 4px solid #f4511e;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: white;
+            cursor: grab;
+            box-shadow: 0 4px #f4511e;
+        }
+
+        .numero-arrastrable:active {
+            cursor: grabbing;
+        }
+
+        /* Botón de validar */
+        .btn-validar {
+            background-color: #ff5e7e;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.6rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px #e04868;
+        }
+
+        .btn-validar:active {
+            box-shadow: 0 1px #e04868;
+            transform: translateY(4px);
+        }
+
+        /* Mensaje de resultado */
+        #mensaje {
+            margin-top: 20px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            min-height: 35px;
+            text-align: center;
+        }
+        
+        .correcto { color: #2e7d32; }
+        .incorrecto { color: #c62828; }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor-juego">
+        <div class="header-usuario">
+            <img id="avatarUsuario" class="avatar-mini" alt="Avatar">
+            <span>¡Hola, <strong id="nombreUsuario">Jugador</strong>! Sigue contando</span>
+        </div>
+
+        <h1>¡Completa la secuencia del 6 al 10!</h1>
+        
+        <button class="btn-parlante" onclick="reproducirInstrucciones()">🔊</button>
+
+        <div class="secuencia-container">
+            <div class="casilla fijo">6</div>
+            <div class="casilla destino" data-numero="7" id="target-7"></div>
+            <div class="casilla fijo">8</div>
+            <div class="casilla destino" data-numero="9" id="target-9"></div>
+            <div class="casilla destino" data-numero="10" id="target-10"></div>
+        </div>
+
+        <h3>Arrastra los números a su lugar:</h3>
+        <div class="opciones-container" id="contenedor-opciones">
+            <div class="numero-arrastrable" draggable="true" id="drag-9" data-val="9">9</div>
+            <div class="numero-arrastrable" draggable="true" id="drag-7" data-val="7">7</div>
+            <div class="numero-arrastrable" draggable="true" id="drag-10" data-val="10">10</div>
+        </div>
+
+        <button class="btn-validar" onclick="validarActividad()">¿Terminé?</button>
+        
+        <div id="mensaje"></div>
+    </div>
+
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            // 1. Cargar datos del alumno guardados en index.html
+            const nombreGuardado = localStorage.getItem("nombre");
+            const avatarGuardado = localStorage.getItem("avatarUsuario");
+
+            const txtNombre = document.getElementById("nombreUsuario");
+            const imgAvatar = document.getElementById("avatarUsuario");
+
+            if (txtNombre) {
+                txtNombre.textContent = nombreGuardado ? nombreGuardado : "Jugador";
+            }
+
+            if (imgAvatar && avatarGuardado) {
+                imgAvatar.src = avatarGuardado;
+            }
+
+            // 2. Voz de bienvenida automática al entrar al nivel 2
+            setTimeout(() => {
+                hablar("¡Excelente! Ahora completemos la secuencia del 6 al 10.");
+            }, 600);
+
+            // 3. Activar funciones de arrastrar y soltar
+            inicializarDragAndDrop();
+        });
+
+        // Función de voz asistida
+        function hablar(texto) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel(); // Detiene cualquier cola de voz anterior
+            
+            let hablarUtterance = new SpeechSynthesisUtterance(texto);
+            hablarUtterance.lang = "es-ES";
+            hablarUtterance.rate = 0.9; // Velocidad amigable para niños
+            window.speechSynthesis.speak(hablarUtterance);
+        }
+
+        // Acción al presionar el parlante amarillo
+        function reproducirInstrucciones() {
+            hablar("Debes deslizar los números a su casilla correspondiente para completar la serie del 6 al 10.");
+        }
+
+        // Sistema Drag and Drop integrado
+        function inicializarDragAndDrop() {
+            const arrastrables = document.querySelectorAll('.numero-arrastrable');
+            const destinos = document.querySelectorAll('.destino');
+            const contenedorOpciones = document.getElementById('contenedor-opciones');
+
+            arrastrables.forEach(elemento => {
+                // Dice el número al empezar a arrastrar
+                elemento.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.id);
+                    hablar(e.target.dataset.val);
+                });
+
+                // También lo dice al hacer clic directo
+                elemento.addEventListener('click', (e) => {
+                    hablar(e.currentTarget.dataset.val);
+                });
+            });
+
+            destinos.forEach(destino => {
+                destino.addEventListener('dragover', (e) => e.preventDefault());
+
+                destino.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const idElemento = e.dataTransfer.getData('text/plain');
+                    const elementoArrastrado = document.getElementById(idElemento);
+                    
+                    if (elementoArrastrado && destino.children.length === 0) {
+                        destino.appendChild(elementoArrastrado);
+                        hablar(elementoArrastrado.dataset.val); // Confirma el número en voz alta
+                    }
+                });
+            });
+
+            // Permitir devolver los bloques de números abajo si se equivocan
+            if (contenedorOpciones) {
+                contenedorOpciones.addEventListener('dragover', (e) => e.preventDefault());
+                contenedorOpciones.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const idElemento = e.dataTransfer.getData('text/plain');
+                    const elementoArrastrado = document.getElementById(idElemento);
+                    if (elementoArrastrado) {
+                        contenedorOpciones.appendChild(elementoArrastrado);
+                    }
+                });
+            }
+        }
+
+        // Validación de resultados
+        function validarActividad() {
+            let aciertos = 0;
+            const casillasDestino = ['target-7', 'target-9', 'target-10'];
+            const divMensaje = document.getElementById('mensaje');
+
+            casillasDestino.forEach(id => {
+                const casilla = document.getElementById(id);
+                if (!casilla) return;
+                const numeroCorrecto = casilla.dataset.numero;
+                
+                if (casilla.firstElementChild && casilla.firstElementChild.dataset.val === numeroCorrecto) {
+                    aciertos++;
+                }
+            });
+
+            if (aciertos === 3) {
+                divMensaje.className = "correcto";
+                divMensaje.innerText = "¡Increíble! Has completado todos los números. 🎉";
+                hablar("¡Increíble! Has completado todos los números. ¡Lo hiciste genial!");
+
+                // ¡Explosión masiva de confeti!
+                if (typeof confetti === "function") {
+                    confetti({
+                        particleCount: 200,
+                        spread: 90,
+                        origin: { y: 0.6 }
+                    });
+                }
+            } else {
+                divMensaje.className = "incorrecto";
+                divMensaje.innerText = "¡Oh, casi! Mira bien el orden de los números e inténtalo otra vez. 💪";
+                hablar("¡Oh, casi! Mira bien el orden de los números e inténtalo otra vez.");
+            }
+        }
+    </script>
+</body>
+</html>

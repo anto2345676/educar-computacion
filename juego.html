@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¡Aprendiendo a Contar del 1 al 5!</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
     <style>
         body {
             font-family: 'Arial Round', 'Comic Sans MS', sans-serif;
@@ -137,10 +140,8 @@
 
     <h1>¡Completa la secuencia!</h1>
     
-    <!-- Botón de sonido (Parlante) -->
     <button class="btn-parlante" onclick="reproducirInstrucciones()" title="Escuchar instrucciones">🔊</button>
 
-    <!-- Secuencia: 1 - _ - 3 - _ - _ -->
     <div class="secuencia-container">
         <div class="casilla fijo">1</div>
         <div class="casilla destino" data-numero="2" id="target-2"></div>
@@ -149,7 +150,6 @@
         <div class="casilla destino" data-numero="5" id="target-5"></div>
     </div>
 
-    <!-- Números abajo para arrastrar -->
     <div class="opciones-container" id="contenedor-opciones">
         <div class="numero-arrastrable" draggable="true" id="drag-4" data-val="4">4</div>
         <div class="numero-arrastrable" draggable="true" id="drag-2" data-val="2">2</div>
@@ -163,24 +163,20 @@
     <script>
         // Función para que el juego hable en español
         function hablar(texto) {
-            // Cancelar cualquier voz que esté sonando para que no se superpongan
             window.speechSynthesis.cancel();
             
             const mensajeVoz = new SpeechSynthesisUtterance(texto);
-            mensajeVoz.lang = 'es-ES'; // Configura el idioma a español
-            mensajeVoz.rate = 0.9;     // Un poquito más lento para los niños
+            mensajeVoz.lang = 'es-ES'; 
+            mensajeVoz.rate = 0.9;     
             window.speechSynthesis.speak(mensajeVoz);
         }
 
-        // Saludo automático al entrar al juego (requiere una interacción previa en algunos navegadores)
         window.addEventListener('DOMContentLoaded', () => {
-            // Intentar hablar al cargar, si el navegador lo bloquea, sonará al interactuar
             setTimeout(() => {
                 hablar("¡Empecemos la actividad!");
             }, 500);
         });
 
-        // Función del botón parlante
         function reproducirInstrucciones() {
             hablar("Debes deslizar los números a su casilla correspondiente.");
         }
@@ -190,13 +186,11 @@
         const destinos = document.querySelectorAll('.destino');
 
         arrastrables.forEach(elemento => {
-            // Al empezar a arrastrar o al tocar (para soporte básico de clics)
             elemento.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', e.target.id);
-                hablar(e.target.dataset.val); // Dice el número al levantarlo
+                hablar(e.target.dataset.val); 
             });
 
-            // Si el niño solo hace clic/toca el número, también lo dice
             elemento.addEventListener('click', (e) => {
                 hablar(e.target.dataset.val);
             });
@@ -204,7 +198,7 @@
 
         destinos.forEach(destino => {
             destino.addEventListener('dragover', (e) => {
-                e.preventDefault(); // Permitir soltar el elemento aquí
+                e.preventDefault(); 
             });
 
             destino.addEventListener('drop', (e) => {
@@ -212,16 +206,13 @@
                 const idElemento = e.dataTransfer.getData('text');
                 const elementoArrastrado = document.getElementById(idElemento);
                 
-                // Si la casilla ya tiene un número, lo devolvemos abajo
                 if (destino.children.length === 0) {
                     destino.appendChild(elementoArrastrado);
-                    // Decir el número de nuevo confirmando que se soltó
                     hablar(elementoArrastrado.dataset.val);
                 }
             });
         });
 
-        // Permitir regresar los números abajo si el niño se arrepiente
         const contenedorOpciones = document.getElementById('contenedor-opciones');
         contenedorOpciones.addEventListener('dragover', (e) => e.preventDefault());
         contenedorOpciones.addEventListener('drop', (e) => {
@@ -241,22 +232,23 @@
                 const casilla = document.getElementById(id);
                 const numeroCorrecto = casilla.dataset.numero;
                 
-                // Verificar si hay un número dentro de la casilla y si es el correcto
                 if (casilla.firstElementChild && casilla.firstElementChild.dataset.val === numeroCorrecto) {
                     aciertos++;
                 }
             });
 
-            // Si los 3 números que faltaban están en su lugar correcto (2, 4 y 5)
+            // Si los 3 números que faltaban están bien puestos
             if (aciertos === 3) {
                 divMensaje.className = "correcto";
                 divMensaje.innerText = "¡Excelente! Lo hiciste increíble. 🎉";
                 hablar("¡Excelente! Lo hiciste increíble.");
+
+                // Ahora que la librería está en el HEAD, esto funcionará:
                 if (typeof confetti === "function") {
                     confetti({
-                        particleCount: 280, // Un poco más de cantidad para que sea vistoso
-                        spread: 80,         // Amplitud del disparo
-                        origin: { y: 0.6 }  // Altura desde donde se lanza (centro bajo)
+                        particleCount: 180, 
+                        spread: 80,         
+                        origin: { y: 0.6 }  
                     });
                 }
             } else {

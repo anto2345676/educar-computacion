@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Aprende los Números del 6 al 10!</title>
+    <style>
+        /* ========== ESTILOS BASE COMPARTIDOS ========== */
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            background-color: #0088ff; /* Tu fondo azul clásico */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            user-select: none;
+        }
+
+        /* ========== USUARIO (Nombre y Avatar) ========== */
+        .info-usuario {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #df6161; /* Tu fondo rojo/naranja */
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+            font-weight: bold;
+        }
+
+        .info-usuario img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* ========== PANTALLAS / VISTAS ========== */
+        .pantalla {
+            background-color: #b4edff; /* Fondo celeste de tarjeta */
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            text-align: center;
+            max-width: 550px; /* Un poco más ancho para que entren cómodos los 5 números */
+            width: 100%;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+
+        /* ========== CONTENEDOR DE NÚMEROS ========== */
+        .numeros-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* ========== FIGURAS DE LOS NÚMEROS ========== */
+        .numero-figura {
+            width: 80px;
+            height: 80px;
+            background-color: #0099ff; /* Azul de botones */
+            color: #ffffff; /* Texto blanco */
+            border-radius: 10px; /* Esquinas redondas */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px rgba(0,0,0,0.1);
+        }
+
+        .numero-figura:hover {
+            transform: scale(1.1);
+            background-color: #2980b9; /* Azul más oscuro al pasar el mouse */
+        }
+
+        .numero-figura:active {
+            transform: scale(0.95);
+        }
+
+        /* ========== BOTÓN SIGUIENTE ========== */
+        .boton-siguiente {
+            background-color: #27ae60; /* Verde */
+            color: #ffffff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+        .boton-siguiente:hover {
+            background-color: #219653; /* Verde oscuro */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="info-usuario">
+        <img id="avatarUsuario" src="" alt="Avatar">
+        <span id="nombreUsuario">Jugador</span>
+    </div>
+
+    <div class="pantalla">
+        <h2>¡Presiona los números para escuchar!</h2>
+
+        <div class="numeros-container">
+            <div class="numero-figura" data-numero="6">6</div>
+            <div class="numero-figura" data-numero="7">7</div>
+            <div class="numero-figura" data-numero="8">8</div>
+            <div class="numero-figura" data-numero="9">9</div>
+            <div class="numero-figura" data-numero="10">10</div>
+        </div>
+
+        <button class="boton-siguiente" onclick="irAlJuego()">Siguiente</button>
+    </div>
+
+    <script src="js/aprende2.js"></script>
+</body>
+</html>

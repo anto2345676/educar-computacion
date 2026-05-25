@@ -14,9 +14,9 @@ window.addEventListener("DOMContentLoaded", () => {
         imgAvatar.src = avatarGuardado;
     }
 
-    // 2. Dar bienvenida por voz al entrar a la pantalla
+    // 2. Dar bienvenida por voz al entrar a la pantalla avanzada
     setTimeout(() => {
-        hablar("¡Vamos a conocer los números! Haz clic en cada uno para escuchar su nombre.");
+        hablar("¡Genial! Ahora conozcamos los números del 6 al 10. Haz clic en cada uno para escuchar su nombre.");
     }, 500);
 
     // 3. Asignar los eventos de clic a las figuras de números
@@ -39,13 +39,13 @@ function hablar(texto) {
     let utterance = new SpeechSynthesisUtterance(texto);
     utterance.lang = "es-ES"; // Español estándar
     utterance.rate = 0.85;    // Velocidad lenta y clara ideal para niños
-    utterance.pitch = 1.1;     // Tono ligeramente agudo / amigable
+    utterance.pitch = 1.1;     // Tono ligeramente amigable
     
     window.speechSynthesis.speak(utterance);
 }
 
 // Función del botón Siguiente
 function irAlJuego() {
-    // Te redirige a la actividad práctica del 1 al 5
-    window.location.href = "juego.html"; 
+    // Te redirige al juego de arrastrar del 6 al 10 que creamos antes
+    window.location.href = "juego2.html"; 
 }
