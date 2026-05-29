@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprendizaje: Tienda Matemática</title>
+    <style>
+        body {
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+            background-color: #e8f5e9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Marcador Superior con Estrella requerido por la pauta */
+        #contenedor-marcador {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .estrella-marcador {
+            font-size: 28px;
+            animation: pulso 2s infinite;
+        }
+
+        .tarjeta-aprendizaje {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 750px;
+        }
+
+        h1 { color: #2e7d32; font-size: 36px; margin-bottom: 10px; }
+        .subtitulo { color: #555; font-size: 18px; margin-bottom: 30px; }
+
+        /* Contenedor de recursos visuales */
+        .recursos-visuales {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .concepto-card {
+            background: #f1f8e9;
+            border: 3px dashed #81c784;
+            border-radius: 20px;
+            padding: 20px;
+            width: 200px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .concepto-card:hover {
+            transform: scale(1.05);
+            background-color: #c8e6c9;
+        }
+        .concepto-card .emoji { font-size: 60px; }
+        .concepto-card .texto { font-size: 22px; font-weight: bold; color: #1b5e20; margin-top: 10px; }
+        .concepto-card .explicacion { font-size: 14px; color: #666; margin-top: 5px; }
+
+        .btn-comenzar {
+            background-color: #ff9f1c;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px rgba(0,0,0,0.2);
+            transition: background-color 0.2s;
+        }
+        .btn-comenzar:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+
+        @keyframes pulso {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="contenedor-marcador">
+        <span class="estrella-marcador">⭐</span>
+        <span>Puntos: <span id="puntos">0</span></span>
+    </div>
+
+    <div class="tarjeta-aprendizaje">
+        <h1>¡Bienvenidos a la Tienda Matemática!</h1>
+        <p class="subtitulo">Haz clic en los conceptos para escuchar su explicación antes de empezar a jugar.</p>
+
+        <div class="recursos-visuales">
+            <div class="concepto-card" onclick="reproducirConcepto('Mayor que. El número de la izquierda tiene más valor o un precio más alto.')">
+                <div class="emoji">👑 &gt;</div>
+                <div class="texto">Signo Mayor</div>
+                <div class="explicacion">Apunta al más grande</div>
+            </div>
+
+            <div class="concepto-card" onclick="reproducirConcepto('Menor que. El número de la izquierda tiene menos valor o un precio más barato.')">
+                <div class="emoji">🌱 &lt;</div>
+                <div class="texto">Signo Menor</div>
+                <div class="explicacion">Apunta al más pequeño</div>
+            </div>
+
+            <div class="concepto-card" onclick="reproducirConcepto('Unidades de Mil. Son los números de cuatro cifras, como los precios de las cosas en la tienda.')">
+                <div class="emoji">💰 $1.000</div>
+                <div class="texto">Unidades de Mil</div>
+                <div class="explicacion">Precios de 4 cifras</div>
+            </div>
+        </div>
+
+        <button class="btn-comenzar" onclick="iniciarJuegos()">¡Ir al Juego 1! 🚀</button>
+    </div>
+
+    <script>
+        // Inicializar el sistema de puntuación acumulativa en el localStorage
+        localStorage.setItem("puntajeAcumulado", "0");
+        document.getElementById("puntos").innerText = localStorage.getItem("puntajeAcumulado");
+
+        // Audio de asistencia interactiva (Lectura de objetos)
+        function reproducirConcepto(mensaje) {
+            window.speechSynthesis.cancel();
+            const lectura = new SpeechSynthesisUtterance(mensaje);
+            lectura.lang = 'es-ES';
+            window.speechSynthesis.speak(lectura);
+        }
+
+        // Progresión secuencial: Redirección al juego 1
+        function iniciarJuegos() {
+            window.speechSynthesis.cancel();
+            window.location.href = "juego1.html"; 
+        }
+    </script>
+</body>
+</html>

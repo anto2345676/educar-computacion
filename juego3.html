@@ -3,344 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡El Gran Desafío del 1 al 10!</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-
+    <title>Tienda Matemática: Juego 3</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body {
-            font-family: 'Arial Round', 'Comic Sans MS', sans-serif;
-            background-color: #e8f5e9; /* Fondo verde pastito suave */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            user-select: none;
-        }
-
-        .contenedor-juego {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            text-align: center;
-            max-width: 800px; /* Más ancho para que quepan los 10 números en fila */
-            width: 95%;
-        }
-
-        .header-usuario {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            background: #e8f5e9;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-        }
-
-        .avatar-mini {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 2px solid #2e7d32;
-            object-fit: cover;
-        }
-
-        h1 {
-            color: #2e7d32;
-            font-size: 2.3rem;
-            text-shadow: 2px 2px #fff;
-            margin-bottom: 10px;
-            margin-top: 10px;
-        }
-
-        /* Botón de Parlante */
-        .btn-parlante {
-            background-color: #ffeb3b;
-            border: 4px solid #fbc02d;
-            border-radius: 50%;
-            font-size: 2.2rem;
-            cursor: pointer;
-            width: 65px;
-            height: 65px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px #fbc02d;
-            transition: all 0.1s;
-            margin-bottom: 20px;
-        }
-
-        .btn-parlante:active {
-            box-shadow: 0 1px #fbc02d;
-            transform: translateY(3px);
-        }
-
-        /* Contenedor de la secuencia */
-        .secuencia-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap; /* Por si la pantalla es pequeña y deben bajarse */
-            gap: 10px;
-            margin: 25px 0;
-        }
-
-        .casilla {
-            width: 65px;
-            height: 65px;
-            background-color: #fff;
-            border: 4px dashed #b0bec5;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #37474f;
-        }
-
-        .casilla.fijo {
-            background-color: #a5d6a7; /* Color verde suave fijo */
-            border-style: solid;
-            border-color: #2e7d32;
-            color: white;
-        }
-
-        /* Contenedor de números para arrastrar */
-        .opciones-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 25px 0;
-            min-height: 85px;
-            background: #f1f8e9;
-            padding: 10px;
-            border-radius: 12px;
-            border: 2px dashed #c5e1a5;
-        }
-
-        .numero-arrastrable {
-            width: 65px;
-            height: 65px;
-            background-color: #ff7043;
-            border: 4px solid #f4511e;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
-            cursor: grab;
-            box-shadow: 0 4px #f4511e;
-        }
-
-        .numero-arrastrable:active {
-            cursor: grabbing;
-        }
-
-        /* Botón de validar */
-        .btn-validar {
-            background-color: #ff5e7e;
-            color: white;
-            border: none;
-            padding: 12px 40px;
-            font-size: 1.6rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 5px #e04868;
-        }
-
-        .btn-validar:active {
-            box-shadow: 0 1px #e04868;
-            transform: translateY(4px);
-        }
-
-        /* Mensaje de resultado */
-        #mensaje {
-            margin-top: 20px;
-            font-size: 1.6rem;
-            font-weight: bold;
-            min-height: 35px;
-            text-align: center;
-        }
-        
-        .correcto { color: #2e7d32; }
-        .incorrecto { color: #c62828; }
+        body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #e8f5e9; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        #marcador { position: absolute; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; }
+        .pantalla-juego { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 80%; max-width: 700px; }
+        h2 { color: #2e7d32; margin-top: 0; }
+        .vitrina { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; background: #f1f8e9; padding: 20px; border-radius: 15px; border: 2px dashed #a5d6a7; min-height: 140px; }
+        .tarjeta-producto { background: white; border: 2px solid #81c784; border-radius: 10px; padding: 10px; width: 110px; text-align: center; cursor: grab; }
+        .tarjeta-producto .icono { font-size: 45px; }
+        .tarjeta-producto .nombre { font-size: 16px; font-weight: bold; }
+        .tarjeta-producto .precio { font-size: 18px; color: #e65100; font-weight: bold; }
+        .zona-balanza { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; }
+        .casilla-destino { width: 140px; height: 160px; border: 4px dashed #9e9e9e; border-radius: 15px; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center; color: #757575; }
+        .signo-central { font-size: 80px; font-weight: bold; color: #2e7d32; }
+        .controles { display: flex; gap: 20px; justify-content: center; }
+        button.btn-accion { padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; }
+        #btn-validar { background-color: #2ec4b6; }
+        #btn-reintentar { background-color: #e71d36; display: none; }
+        #btn-siguiente { background-color: #ff9f1c; display: none; }
+        #mensaje { margin-top: 20px; font-size: 24px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="contenedor-juego">
-        <div class="header-usuario">
-            <img id="avatarUsuario" class="avatar-mini" alt="Avatar">
-            <span>¡Hola, <strong id="nombreUsuario">Jugador</strong>! Vamos al súper desafío</span>
-        </div>
+    <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
+    <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-        <h1>¡Completa la secuencia del 1 al 10!</h1>
+    <div class="pantalla-juego">
+        <h2>Juego 3: Grandes Valores</h2>
+        <p style="font-weight: bold; color: #555;">¡Compara con atención! Arrastra los objetos para respetar la condición MENOR QUE (&lt;).</p>
         
-        <button class="btn-parlante" onclick="reproducirInstrucciones()">🔊</button>
+        <div class="vitrina" id="vitrina-productos"></div>
 
-        <div class="secuencia-container">
-            <div class="casilla fijo">1</div>
-            <div class="casilla destino" data-numero="2" id="target-2"></div>
-            <div class="casilla fijo">3</div>
-            <div class="casilla fijo">4</div>
-            <div class="casilla destino" data-numero="5" id="target-5"></div>
-            <div class="casilla fijo">6</div>
-            <div class="casilla fijo">7</div>
-            <div class="casilla destino" data-numero="8" id="target-8"></div>
-            <div class="casilla fijo">9</div>
-            <div class="casilla destino" data-numero="10" id="target-10"></div>
+        <div class="zona-balanza">
+            <div class="casilla-destino" id="casilla-izquierda" ondragover="permitirSoltar(event)" ondrop="soltarProducto(event, 'izq')">Coloca aquí</div>
+            <div class="signo-central">&lt;</div>
+            <div class="casilla-destino" id="casilla-derecha" ondragover="permitirSoltar(event)" ondrop="soltarProducto(event, 'der')">Coloca aquí</div>
         </div>
 
-        <h3>Arrastra los números a su lugar:</h3>
-        <div class="opciones-container" id="contenedor-opciones">
-            <div class="numero-arrastrable" draggable="true" id="drag-5" data-val="5">5</div>
-            <div class="numero-arrastrable" draggable="true" id="drag-2" data-val="2">2</div>
-            <div class="numero-arrastrable" draggable="true" id="drag-10" data-val="10">10</div>
-            <div class="numero-arrastrable" draggable="true" id="drag-8" data-val="8">8</div>
+        <div class="controles">
+            <button class="btn-accion" id="btn-validar" onclick="validarJuego()">Validar</button>
+            <button class="btn-accion" id="btn-reintentar" onclick="reintentar()">Volver a intentar</button>
+            <button class="btn-accion" id="btn-siguiente" onclick="siguiente()">Siguiente Juego</button>
         </div>
-
-        <button class="btn-validar" onclick="validarActividad()">¿Terminé?</button>
-        
         <div id="mensaje"></div>
     </div>
 
     <script>
-        window.addEventListener("DOMContentLoaded", () => {
-            // 1. Cargar datos del alumno
-            const nombreGuardado = localStorage.getItem("nombre");
-            const avatarGuardado = localStorage.getItem("avatarUsuario");
+        const productos = [
+            { id: "p5", nombre: "Bicicleta", precio: 8990, icono: "🚲" },
+            { id: "p6", nombre: "Libro", precio: 3500, icono: "📚" }
+        ];
 
-            const txtNombre = document.getElementById("nombreUsuario");
-            const imgAvatar = document.getElementById("avatarUsuario");
+        let puntaje = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+        let prodIzq = null, prodDer = null, arrastrado = null;
 
-            if (txtNombre) {
-                txtNombre.textContent = nombreGuardado ? nombreGuardado : "Jugador";
-            }
+        document.getElementById("puntos").innerText = puntaje;
+        cargarProductos();
 
-            if (imgAvatar && avatarGuardado) {
-                imgAvatar.src = avatarGuardado;
-            }
-
-            // 2. Voz de bienvenida automática
-            setTimeout(() => {
-                hablar("¡Llegaste al gran desafío final! Completemos la secuencia del 1 al 10.");
-            }, 600);
-
-            // 3. Activar funciones de arrastrar y soltar
-            inicializarDragAndDrop();
-        });
-
-        // Función de voz asistida
-        function hablar(texto) {
-            if (!('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel(); 
-            
-            let hablarUtterance = new SpeechSynthesisUtterance(texto);
-            hablarUtterance.lang = "es-ES";
-            hablarUtterance.rate = 0.9; 
-            window.speechSynthesis.speak(hablarUtterance);
+        function cargarProductos() {
+            const vitrina = document.getElementById("vitrina-productos");
+            vitrina.innerHTML = "";
+            productos.forEach(p => {
+                const div = document.createElement("div");
+                div.className = "tarjeta-producto";
+                div.id = p.id;
+                div.draggable = true;
+                div.ondragstart = () => { arrastrado = p; leerTexto(`Llevando ${p.nombre}`); };
+                div.onclick = () => leerTexto(`${p.nombre}, cuesta ${p.precio} pesos`);
+                div.innerHTML = `<div class="icono">${p.icono}</div><div class="nombre">${p.nombre}</div><div class="precio">$${p.precio}</div>`;
+                vitrina.appendChild(div);
+            });
         }
 
-        // Acción al presionar el parlante amarillo
-        function reproducirInstrucciones() {
-            hablar("Pon mucha atención. Desliza los números que faltan para ordenar la fila desde el 1 hasta el 10.");
+        function permitirSoltar(ev) { ev.preventDefault(); }
+
+        function soltarProducto(ev, lado) {
+            ev.preventDefault();
+            const el = document.getElementById(arrastrado.id);
+            ev.currentTarget.innerHTML = "";
+            ev.currentTarget.appendChild(el);
+            ev.currentTarget.style.backgroundColor = "#e8f5e9";
+            if(lado === 'izq') prodIzq = arrastrado; else prodDer = arrastrado;
+            leerTexto(`Pusiste ${arrastrado.nombre}`);
         }
 
-        // Sistema Drag and Drop
-        function inicializarDragAndDrop() {
-            const arrastrables = document.querySelectorAll('.numero-arrastrable');
-            const destinos = document.querySelectorAll('.destino');
-            const contenedorOpciones = document.getElementById('contenedor-opciones');
-
-            arrastrables.forEach(elemento => {
-                elemento.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', e.target.id);
-                    hablar(e.target.dataset.val);
-                });
-
-                elemento.addEventListener('click', (e) => {
-                    hablar(e.currentTarget.dataset.val);
-                });
-            });
-
-            destinos.forEach(destino => {
-                destino.addEventListener('dragover', (e) => e.preventDefault());
-
-                destino.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    const idElemento = e.dataTransfer.getData('text/plain');
-                    const elementoArrastrado = document.getElementById(idElemento);
-                    
-                    if (elementoArrastrado && destino.children.length === 0) {
-                        destino.appendChild(elementoArrastrado);
-                        hablar(elementoArrastrado.dataset.val); 
-                    }
-                });
-            });
-
-            if (contenedorOpciones) {
-                contenedorOpciones.addEventListener('dragover', (e) => e.preventDefault());
-                contenedorOpciones.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    const idElemento = e.dataTransfer.getData('text/plain');
-                    const elementoArrastrado = document.getElementById(idElemento);
-                    if (elementoArrastrado) {
-                        contenedorOpciones.appendChild(elementoArrastrado);
-                    }
-                });
-            }
-        }
-
-        // Validación de resultados
-        function validarActividad() {
-            let aciertos = 0;
-            const casillasDestino = ['target-2', 'target-5', 'target-8', 'target-10'];
-            const divMensaje = document.getElementById('mensaje');
-
-            casillasDestino.forEach(id => {
-                const casilla = document.getElementById(id);
-                if (!casilla) return;
-                const numeroCorrecto = casilla.dataset.numero;
-                
-                if (casilla.firstElementChild && casilla.firstElementChild.dataset.val === numeroCorrecto) {
-                    aciertos++;
-                }
-            });
-
-            // Son 4 aciertos requeridos en este nivel masivo
-            if (aciertos === 4) {
-                divMensaje.className = "correcto";
-                divMensaje.innerText = "🏆 ¡Felicidades! Eres un maestro de los números del 1 al 10. 🏆";
-                hablar("¡Felicidades! Completaste todo el juego perfectamente. Eres un maestro de los números.");
-
-                // Súper ráfaga de confeti (tres disparos continuos)
-                if (typeof confetti === "function") {
-                    let duracion = 2 * 1000;
-                    let fin = Date.now() + duracion;
-
-                    (function cuadro() {
-                        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
-                        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
-
-                        if (Date.now() < fin) {
-                            requestAnimationFrame(cuadro);
-                        }
-                    }());
-                }
+        function validarJuego() {
+            if(!prodIzq || !prodDer) { leerTexto("Coloca ambos productos."); return; }
+            if(prodIzq.precio < prodDer.precio) {
+                document.getElementById("mensaje").innerText = "¡Excelente! El libro es menor que la bicicleta.";
+                document.getElementById("mensaje").style.color = "green";
+                leerTexto("Muy bien, correcto. Presiona siguiente juego.");
+                document.getElementById("btn-validar").style.display = "none";
+                document.getElementById("btn-siguiente").style.display = "inline-block";
             } else {
-                divMensaje.className = "incorrecto";
-                divMensaje.innerText = "¡Oh, te falta poquito! Revisa la secuencia e inténtalo de nuevo. 🎈";
-                hablar("¡Oh, te falta poquito! Revisa la secuencia e inténtalo de nuevo.");
+                document.getElementById("mensaje").innerText = "¡Inténtalo nuevamente!";
+                document.getElementById("mensaje").style.color = "red";
+                leerTexto("Inténtalo nuevamente.");
+                document.getElementById("btn-validar").style.display = "none";
+                document.getElementById("btn-reintentar").style.display = "inline-block";
             }
         }
+
+        function reintentar() {
+            prodIzq = null; prodDer = null;
+            document.getElementById("casilla-izquierda").innerHTML = "Coloca aquí";
+            document.getElementById("casilla-derecha").innerHTML = "Coloca aquí";
+            document.getElementById("casilla-izquierda").style.backgroundColor = "#f5f5f5";
+            document.getElementById("casilla-derecha").style.backgroundColor = "#f5f5f5";
+            document.getElementById("btn-validar").style.display = "inline-block";
+            document.getElementById("btn-reintentar").style.display = "none";
+            document.getElementById("mensaje").innerText = "";
+            cargarProductos();
+        }
+
+        function siguiente() {
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+            setTimeout(() => {
+                puntaje += 10;
+                localStorage.setItem("puntajeAcumulado", puntaje);
+                window.location.href = "juego4.html"; // Redirecciona de forma secuencial al Juego 4
+            }, 600);
+        }
+
+        function leerTexto(t) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang='es-ES'; window.speechSynthesis.speak(u); }
+        function leerIndicaciones() { leerTexto("Arrastra los productos para que el de la izquierda sea menor que el de la derecha."); }
     </script>
 </body>
 </html>

@@ -61,3 +61,48 @@ body{
             border-radius: 5px;
             cursor: pointer;
         }
+/* Contenedor para alinear los botones uno al lado del otro o centrados */
+            .botones-contenedor {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Ajuste al botón ingresar original */
+        .btn-ingresar {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .btn-ingresar:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilos para el nuevo botón 4° Básico */
+        .btn-basico {
+            display: inline-block;
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #a25afd; /* Color morado atractivo */
+            color: white;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 3px 0px #793cb8; /* Efecto 3D simple */
+        }
+
+        .btn-basico:hover {
+            background-color: #8e44ad;
+            transform: translateY(1px);
+            box-shadow: 0px 2px 0px #793cb8;
+        }

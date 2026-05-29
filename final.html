@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Felicitaciones!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .pantalla-final {
+            text-align: center;
+            background: white;
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            max-width: 600px;
+            width: 85%;
+            animation: aparecer 0.8s ease-out;
+        }
+
+        h1 {
+            color: #7209b7;
+            font-size: 38px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .puntaje-final {
+            font-size: 28px;
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        /* Animación de las Tres Estrellas Requeridas ⭐⭐⭐ */
+        .contenedor-estrellas {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .estrella {
+            font-size: 70px;
+            animation: brincar 1.2s infinite ease-in-out;
+            display: inline-block;
+        }
+        .estrella:nth-child(2) { animation-delay: 0.2s; }
+        .estrella:nth-child(3) { animation-delay: 0.4s; }
+
+        .btn-reiniciar {
+            background-color: #7209b7;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        .btn-reiniciar:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+
+        /* Animaciones visuales */
+        @keyframes aparecer {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes brincar {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-25px) scale(1.15); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pantalla-final">
+        <div class="contenedor-estrellas">
+            <span class="estrella">⭐</span>
+            <span class="estrella">⭐</span>
+            <span class="estrella">⭐</span>
+        </div>
+
+        <h1>¡Felicitaciones, completaste todos los juegos!</h1>
+        <div class="puntaje-final">Lograste un total de: <span id="total-puntos">0</span> puntos</div>
+
+        <button class="btn-reiniciar" onclick="volverAEmpezar()">Volver al Inicio 🏠</button>
+    </div>
+
+    <script>
+        // Obtener el registro acumulado total de todos los juegos pasados
+        const puntosFinales = localStorage.getItem("puntajeAcumulado") || "0";
+        document.getElementById("total-puntos").innerText = puntosFinales;
+
+        // Ejecutar efectos automáticos al cargar la página final
+        window.onload = () => {
+            lanzarGranConfeti();
+            reproducirLogroAudio();
+        };
+
+        // Parte 5: Efecto visual masivo de confeti continuo
+        function lanzarGranConfeti() {
+            let duracion = 4 * 1000;
+            let fin = Date.now() + duracion;
+
+            (function frame() {
+                confetti({
+                    particleCount: 4,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 4,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < fin) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // Parte 5: Audio automático de logro o celebración
+        function reproducirLogroAudio() {
+            window.speechSynthesis.cancel();
+            const mensaje = new SpeechSynthesisUtterance("¡Excelente trabajo! Felicitaciones, completaste todos los juegos con éxito. ¡Eres un experto!");
+            mensaje.lang = 'es-ES';
+            window.speechSynthesis.speak(mensaje);
+        }
+
+        // Reinicia el puntaje y regresa a la página inicial de aprendizaje
+        function volverAEmpezar() {
+            window.speechSynthesis.cancel();
+            localStorage.setItem("puntajeAcumulado", "0"); // Resetea la puntuación a cero
+            window.location.href = "basico4.html"; // Cambia esto al nombre exacto de tu primera página si es diferente
+        }
+    </script>
+</body>
+</html>

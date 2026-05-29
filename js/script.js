@@ -2,110 +2,83 @@ let avatarSeleccionado = null;
 
 // Seleccionar avatar
 function seleccionar(img) {
-
-    // Obtener todos los avatares
     let avatares = document.querySelectorAll('.avatares img');
-
-    // Quitar selección anterior
     avatares.forEach(a => a.classList.remove('seleccionado'));
 
-    // Agregar selección al avatar clickeado
     img.classList.add('seleccionado');
-
-    // Guardar avatar seleccionado
-    avatarSeleccionado = img.src;
+    avatarSeleccionado = img.getAttribute("src");
 
     // Sonido click
-    document.getElementById("audioAvatar").play();
+    const audio = document.getElementById("audioAvatar");
+    if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log("Audio bloqueado"));
+    }
 
     // Voz avatar seleccionado
-    let mensaje = new SpeechSynthesisUtterance(
-        "Avatar seleccionado"
-    );
-
+    window.speechSynthesis.cancel(); 
+    let mensaje = new SpeechSynthesisUtterance("Avatar seleccionado");
     mensaje.lang = "es-ES";
-
-    speechSynthesis.speak(mensaje);
+    window.speechSynthesis.speak(mensaje);
 }
-
 
 // Botón ingresar
 function ingresar() {
-
-    // Obtener nombre
     let nombre = document.getElementById('nombre').value.trim();
+    
+    // Cancelamos cualquier audio previo para que la alerta sea inmediata
+    window.speechSynthesis.cancel(); 
 
-
-    // CASO 1
-    // Falta nombre y avatar
+    // CASO 1: Falta nombre Y falta avatar
     if (nombre === "" && avatarSeleccionado === null) {
-
-        let voz = new SpeechSynthesisUtterance(
-        hablar ("Debes escribir tu nombre e ingresar un avatar") 
-        );
-
+        let voz = new SpeechSynthesisUtterance("Debes escribir tu nombre y seleccionar un avatar");
         voz.lang = "es-ES";
-
-        speechSynthesis.speak(voz);
-
+        window.speechSynthesis.speak(voz);
         return;
     }
 
-
-    // CASO 2
-    // Falta nombre
+    // CASO 2: Falta nombre únicamente
     if (nombre === "") {
-
-        let voz = new SpeechSynthesisUtterance(
-            hablar ("Debes escribir tu nombre") 
-        );
-
+        let voz = new SpeechSynthesisUtterance("Debes escribir tu nombre");
         voz.lang = "es-ES";
-
-        speechSynthesis.speak(voz);
-
+        window.speechSynthesis.speak(voz);
         return;
     }
 
-
-    // CASO 3
-    // Falta avatar
+    // CASO 3: Falta avatar únicamente
     if (avatarSeleccionado === null) {
-
-        let voz = new SpeechSynthesisUtterance(
-            "Seleccione un avatar"
-        );
-
+        let voz = new SpeechSynthesisUtterance("Seleccione un avatar");
         voz.lang = "es-ES";
-
-        speechSynthesis.speak(voz);
-
+        window.speechSynthesis.speak(voz);
         return;
     }
 
+    // Guardar los datos si todo está correcto
+    localStorage.setItem("nombre", nombre);
+    localStorage.setItem("avatarUsuario", avatarSeleccionado);
 
-    // TODO CORRECTO
-    let voz = new SpeechSynthesisUtterance(
-        "Bien hecho " + nombre
-    );
+    // Reproducir sonido de felicitaciones (opcional, si tienes el archivo)
+    const audioFeli = document.getElementById("audioFelicidades");
+    if (audioFeli) {
+        audioFeli.play().catch(e => console.log("Audio bloqueado"));
+    }
 
+    // Todo Correcto: Hablar y redirigir al terminar
+    let voz = new SpeechSynthesisUtterance("Bien hecho " + nombre);
     voz.lang = "es-ES";
+    
+    voz.onend = function() {
+        window.location.href = "inicio.html"; 
+    };
 
-    speechSynthesis.speak(voz);
+    window.speechSynthesis.speak(voz);
 
-
-    // Confetti
-    confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 }
-    });
-
-
-    // Abrir otra página después de 2 segundos
-    setTimeout(() => {
-
-        window.location.href = "inicio.html";
-
-    }, 2000);
+    // Confetti instantáneo
+    if (typeof confetti === "function") {
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    }
 }

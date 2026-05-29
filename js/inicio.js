@@ -1,37 +1,41 @@
-// Cargar y mostrar los datos guardados
 window.addEventListener("DOMContentLoaded", () => {
+    // Forzamos una limpieza de síntesis al cargar la página por seguridad
+    window.speechSynthesis.cancel();
+
     const nombreGuardado = localStorage.getItem("nombre");
     const avatarGuardado = localStorage.getItem("avatarUsuario");
 
-    if (nombreGuardado) {
-        document.getElementById("nombreUsuario").textContent = nombreGuardado;
-    } else {
-        document.getElementById("nombreUsuario").textContent = "Invitado";
+    const txtNombre = document.getElementById("nombreUsuario");
+    const imgAvatar = document.getElementById("avatarUsuario");
+
+    if (txtNombre) {
+        txtNombre.textContent = nombreGuardado ? nombreGuardado : "Invitado";
     }
 
-    if (avatarGuardado) {
-        document.getElementById("avatarUsuario").src = avatarGuardado;
-    } else {
-        document.getElementById("avatarUsuario").alt = "Sin avatar seleccionado";
+    if (imgAvatar) {
+        if (avatarGuardado) {
+            imgAvatar.src = avatarGuardado;
+            imgAvatar.style.display = "block"; 
+        } else {
+            imgAvatar.alt = "Sin avatar seleccionado";
+        }
     }
 });
-function mensajeVoz() {
-    // Texto que se va a decir
-    let texto = "¡Excelente! Continuemos con las actividades";
-    
-    // Crear objeto de síntesis de voz
-    let hablar = new SpeechSynthesisUtterance();
-    hablar.text = texto;
-    hablar.lang = "es-ES"; // Idioma: Español
-    hablar.volume = 1;     // Volumen (0 a 1)
-    hablar.rate = 1;      // Velocidad (1 = normal)
-    hablar.pitch = 1.2;   // Tono de voz (más alto o más grave)
 
-    // Ejecutar la voz
+function mensajeVoz() {
+    window.speechSynthesis.cancel(); // Detener cualquier residuo de voz
+    
+    let texto = "¡Excelente! Continuemos con las actividades";
+    let hablar = new SpeechSynthesisUtterance(texto);
+    hablar.lang = "es-ES"; 
+    hablar.volume = 1;      
+    hablar.rate = 1;       
+    hablar.pitch = 1.2;   
+
+    // SÓLO cuando termine de hablar la frase del botón "Seguir", cambiará a aprende.html
+    hablar.onend = function() {
+        window.location.href = "aprende.html"; 
+    };
+
     window.speechSynthesis.speak(hablar);
 }
-setTimeout(() => {
-
-        window.location.href = "aprende.html";
-
-    }, 2000);
