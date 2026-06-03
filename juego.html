@@ -32,9 +32,8 @@
 
     <div class="pantalla-juego">
         <h2>Juego 1: ¡El Reto de las Donas! 🍩</h2>
-        <p style="font-weight: bold; color: #555;">En el plato azul hay 2 donas. Arrastra desde la bandeja de arriba las donas necesarias a la caja verde para que la cantidad sea **MAYOR** que 2.</p>
+        <p style="font-weight: bold; color: #555;">En el plato amarillo hay 2 donas. Arrastra desde la bandeja de arriba las donas necesarias a la caja verde para que la cantidad sea **MAYOR** que 2.</p>
         
-        <!-- Bandeja de origen -->
         <div class="fuente-donas" id="bandeja" ondragover="permitirSoltar(event)" ondrop="soltarDeVuelta(event)">
             <div class="dona" id="d1" draggable="true" ondragstart="start(event)">🍩</div>
             <div class="dona" id="d2" draggable="true" ondragstart="start(event)">🍩</div>
@@ -44,12 +43,10 @@
         </div>
 
         <div class="zona-comparacion">
-            <!-- Caja destino izquierda -->
             <div class="caja-destino" id="caja-izquierda" ondragover="permitirSoltar(event)" ondrop="soltarEnCaja(event)"></div>
             
             <div class="signo">&gt;</div>
             
-            <!-- Plato fijo derecho con 2 donas -->
             <div class="plato-fijo">
                 <div class="dona">🍩</div>
                 <div class="dona">🍩</div>
@@ -65,7 +62,9 @@
     </div>
 
     <script>
-        let puntaje = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+        // CAMBIO AQUÍ: Como borraste la pantalla anterior, obligamos a que el juego arranque en 0 puntos siempre.
+        let puntaje = 0;
+        localStorage.setItem("puntajeAcumulado", puntaje);
         document.getElementById("puntos").innerText = puntaje;
 
         function start(ev) { ev.dataTransfer.setData("text", ev.target.id); }
@@ -87,12 +86,17 @@
         function validarJuego() {
             const donasEnCaja = document.getElementById("caja-izquierda").children.length;
             
-            // Para ser > 2, debe colocar 3 o más donas
             if (donasEnCaja > 2) {
                 confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
                 document.getElementById("mensaje").innerText = "¡Excelente! Pusiste " + donasEnCaja + " donas. ¡Es mayor que 2!";
                 document.getElementById("mensaje").style.color = "green";
                 leerTexto("¡Muy bien hecho! Es correcto. Presiona el botón para ir al siguiente juego.");
+                
+                // MEJORA AQUÍ: Sumamos y mostramos los puntos inmediatamente en pantalla como recompensa visual
+                puntaje += 10;
+                localStorage.setItem("puntajeAcumulado", puntaje);
+                document.getElementById("puntos").innerText = puntaje;
+
                 document.getElementById("btn-validar").style.display = "none";
                 document.getElementById("btn-siguiente").style.display = "inline-block";
             } else {
@@ -116,8 +120,8 @@
         }
 
         function siguiente() {
-            puntaje += 10;
-            localStorage.setItem("puntajeAcumulado", puntaje);
+            window.speechSynthesis.cancel();
+            // Ya no sumamos los puntos aquí porque los sumamos arriba al ganar
             window.location.href = "juego2.html";
         }
 

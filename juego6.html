@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Matemática: Juego 6</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+            background-color: #fff3e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        #marcador { position: absolute; top: 20px; right: 20px; background-color: #ff9800; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; }
+        #contenedor-tiempo { position: absolute; top: 20px; width: 300px; background-color: #ddd; border-radius: 10px; overflow: hidden; height: 20px; }
+        #barra-tiempo { width: 100%; height: 100%; background-color: #e53935; transition: width 1s linear; }
+        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; }
+        .pantalla-juego { text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 80%; max-width: 600px; }
+        h2 { color: #e65100; margin-top: 0; }
+        .etiqueta-loca { background-color: #fffde7; border: 4px dashed #fbc02d; border-radius: 15px; padding: 30px; margin: 30px 0; display: flex; align-items: center; justify-content: center; gap: 25px; font-size: 55px; font-weight: bold; color: #333; }
+        .signo { color: #d32f2f; font-size: 70px; }
+        .zona-botones { display: flex; justify-content: center; gap: 30px; }
+        .btn-decision { padding: 20px 40px; font-size: 24px; font-weight: bold; border: none; border-radius: 15px; cursor: pointer; color: white; box-shadow: 0 6px rgba(0,0,0,0.2); }
+        .btn-decision:active { transform: translateY(4px); box-shadow: none; }
+        .verdadero { background-color: #4caf50; box-shadow: 0 6px #388e3c; }
+        .falso { background-color: #f44336; box-shadow: 0 6px #d32f2f; }
+        #btn-siguiente { background-color: #2196f3; padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; display: none; margin: 20px auto 0 auto; }
+        #mensaje { margin-top: 25px; font-size: 26px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
+    <div id="contenedor-tiempo"><div id="barra-tiempo"></div></div>
+    <div id="marcador">⭐ Puntos Partida: <span id="puntos">0</span></div>
+
+    <div class="pantalla-juego">
+        <h2 id="titulo-pantalla">Desafío 1</h2>
+        <p style="font-size: 18px; color: #666; font-weight: bold;">¿Esta etiqueta de precios dice la verdad o miente?</p>
+
+        <div class="etiqueta-loca">
+            <span id="num-izq">0</span>
+            <span class="signo" id="signo-medio">?</span>
+            <span id="num-der">0</span>
+        </div>
+
+        <div class="zona-botones" id="bloque-decisiones">
+            <button class="btn-decision verdadero" onclick="responder(true)">👍 VERDADERO</button>
+            <button class="btn-decision falso" onclick="responder(false)">👎 FALSO</button>
+        </div>
+        <button id="btn-siguiente" onclick="avanzarNivel()">Siguiente Desafío</button>
+        <div id="mensaje"></div>
+    </div>
+
+    <script>
+        const retos = [
+            { izq: 1500, signo: ">", der: 900, respuestaCorrecta: true, texto: "1500 es mayor que 900" },
+            { izq: 4300, signo: "<", der: 2100, respuestaCorrecta: false, texto: "4300 es menor que 2100" },
+            { izq: 750,  signo: ">", der: 1250, respuestaCorrecta: false, texto: "750 es mayor que 1250" },
+            { izq: 6100, signo: "<", der: 8900, respuestaCorrecta: true, texto: "6100 es menor que 8900" }
+        ];
+
+        let nivelActual = 0;
+        let puntajeJuegoActual = 0;
+        let tiempoRestante = 15;
+        let temporizador;
+        let respondido = false;
+
+        cargarReto();
+
+        function cargarReto() {
+            if (nivelActual >= retos.length) {
+                terminarJuego();
+                return;
+            }
+
+            respondido = false;
+            tiempoRestante = 15;
+            document.getElementById("titulo-pantalla").innerText = `Desafío ${nivelActual + 1} de ${retos.length}`;
+            document.getElementById("mensaje").innerText = "";
+            document.getElementById("puntos").innerText = puntajeJuegoActual;
+            
+            document.getElementById("num-izq").innerText = `$${retos[nivelActual].izq}`;
+            document.getElementById("signo-medio").innerText = retos[nivelActual].signo;
+            document.getElementById("num-der").innerText = `$${retos[nivelActual].der}`;
+
+            document.getElementById("bloque-decisiones").style.display = "flex";
+            document.getElementById("btn-siguiente").style.display = "none";
+            document.getElementById("barra-tiempo").style.width = "100%";
+
+            clearInterval(temporizador);
+            temporizador = setInterval(reducirTiempo, 1000);
+            leerTexto(`¿Es verdadero o falso que, ${retos[nivelActual].texto}?`);
+        }
+
+        function reducirTiempo() {
+            if (respondido) return;
+            tiempoRestante--;
+            document.getElementById("barra-tiempo").style.width = `${(tiempoRestante / 15) * 100}%`;
+
+            if (tiempoRestante <= 0) {
+                clearInterval(temporizador);
+                evaluarRespuesta(null);
+            }
+        }
+
+        function responder(eleccionUsuario) {
+            if (respondido) return;
+            clearInterval(temporizador);
+            respondido = true;
+            evaluarRespuesta(eleccionUsuario === retos[nivelActual].respuestaCorrecta);
+        }
+
+        function evaluarRespuesta(resultado) {
+            document.getElementById("bloque-decisiones").style.display = "none";
+            document.getElementById("btn-siguiente").style.display = "block";
+            const msg = document.getElementById("mensaje");
+
+            if (resultado === true) {
+                msg.innerText = "¡Excelente Supervisor! Detectaste el valor real. 🌟";
+                msg.style.color = "green";
+                puntajeJuegoActual += 10;
+                document.getElementById("puntos").innerText = puntajeJuegoActual;
+                confetti({ particleCount: 50, spread: 40, origin: { y: 0.7 } });
+                leerTexto("¡Excelente! Respuesta correcta.");
+            } else if (resultado === false) {
+                msg.innerText = "¡Oh no! La etiqueta te ha engañado. 🧩";
+                msg.style.color = "red";
+                leerTexto("Oh, te has equivocado.");
+            } else {
+                msg.innerText = "⏰ ¡Se agotó el tiempo!";
+                msg.style.color = "orange";
+                leerTexto("Se acabó el tiempo.");
+            }
+        }
+
+        function avanzarNivel() { nivelActual++; cargarReto(); }
+
+        function terminarJuego() {
+            clearInterval(temporizador);
+            window.speechSynthesis.cancel();
+            let acumulado = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+            localStorage.setItem("puntajeAcumulado", acumulado + puntajeJuegoActual);
+            window.location.href = "4basico.html";
+        }
+
+        function leerTexto(t) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'es-ES'; window.speechSynthesis.speak(u); }
+        function leerIndicaciones() { leerTexto("Mira la comparación y presiona el botón verde si es verdadera, o el botón rojo si es falsa antes de que se termine el tiempo."); }
+    </script>
+</body>
+</html>
