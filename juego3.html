@@ -9,22 +9,50 @@
         body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #e8f5e9; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
         #marcador { position: absolute; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; }
-        .pantalla-juego { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 80%; max-width: 700px; }
+        
+        .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 85%; max-width: 700px; }
+        .pantalla-final { display: none; }
         h2 { color: #2e7d32; margin-top: 0; }
-        .vitrina { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; background: #f1f8e9; padding: 20px; border-radius: 15px; border: 2px dashed #a5d6a7; min-height: 140px; }
-        .tarjeta-producto { background: white; border: 2px solid #81c784; border-radius: 10px; padding: 10px; width: 110px; text-align: center; cursor: grab; }
-        .tarjeta-producto .icono { font-size: 45px; }
-        .tarjeta-producto .nombre { font-size: 16px; font-weight: bold; }
-        .tarjeta-producto .precio { font-size: 18px; color: #e65100; font-weight: bold; }
-        .zona-balanza { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; }
-        .casilla-destino { width: 140px; height: 160px; border: 4px dashed #9e9e9e; border-radius: 15px; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center; color: #757575; }
-        .signo-central { font-size: 80px; font-weight: bold; color: #2e7d32; }
+
+        /* Contenedor del Cajero */
+        .cajero-contenedor { display: flex; align-items: center; justify-content: center; gap: 25px; margin: 25px 0; background: #efebe9; padding: 25px; border-radius: 20px; border: 4px solid #795548; }
+        
+        /* Cajas de Destino de colores (Verde e Izquierda / Amarilla y Derecha) */
+        .pantalla-producto-izq { width: 160px; min-height: 160px; border: 4px dashed #b2dfdb; border-radius: 15px; background-color: #e0f2f1; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.3s ease, border-color 0.3s ease; }
+        .pantalla-producto-der { width: 160px; min-height: 160px; border: 4px solid #ffb74d; border-radius: 15px; background-color: #fff8e1; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.3s ease, border-color 0.3s ease; }
+        
+        .icono { font-size: 55px; margin-bottom: 5px; }
+        .nombre { font-size: 18px; font-weight: bold; color: #424242; }
+        .precio { font-size: 22px; color: #e65100; font-weight: bold; margin-top: 5px; }
+
+        /* Espacio para el signo seleccionado */
+        .ranura-signo { width: 100px; height: 100px; background: #263238; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #00e676; font-size: 65px; font-weight: bold; border: 3px solid #37474f; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+
+        /* Teclado de Operadores */
+        .teclado-signos { display: flex; gap: 20px; justify-content: center; margin-bottom: 25px; background: #f1f8e9; padding: 15px; border-radius: 15px; border: 2px dashed #a5d6a7; transition: transform 0.3s ease, border-color 0.3s ease; }
+        .btn-signo { width: 80px; height: 80px; font-size: 45px; font-weight: bold; color: white; background-color: #37474f; border: none; border-radius: 15px; cursor: pointer; box-shadow: 0 6px #263238; transition: all 0.1s ease; }
+        .btn-signo:active { box-shadow: 0 2px #263238; transform: translateY(4px); }
+        .btn-signo.seleccionado { background-color: #00c853; box-shadow: 0 6px #00a142; }
+
+        /* Animación de pálpito igual a los juegos 1 y 2 */
+        @keyframes palpitar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(230, 81, 0, 0.4); }
+            100% { transform: scale(1); }
+        }
+        .efecto-hablar {
+            animation: palpitar 0.8s ease-in-out 2;
+            border-color: #e65100 !important;
+        }
+
         .controles { display: flex; gap: 20px; justify-content: center; }
         button.btn-accion { padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; }
         #btn-validar { background-color: #2ec4b6; }
         #btn-reintentar { background-color: #e71d36; display: none; }
         #btn-siguiente { background-color: #ff9f1c; display: none; }
+        .btn-menu { background-color: #795548; }
         #mensaje { margin-top: 20px; font-size: 24px; font-weight: bold; }
+        .resultado-puntos { font-size: 32px; color: #2e7d32; margin: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -32,105 +60,255 @@
     <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
     <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <div class="pantalla-juego">
-        <h2>Juego 3: Grandes Valores</h2>
-        <p style="font-weight: bold; color: #555;">¡Compara con atención! Arrastra los objetos para respetar la condición MENOR QUE (&lt;).</p>
+    <div class="pantalla-juego" id="contenedor-juego">
+        <h2 id="titulo-juego">Juego 3: El Cajero de los Signos</h2>
+        <p id="instrucciones-juego" style="font-weight: bold; color: #555;"></p>
         
-        <div class="vitrina" id="vitrina-productos"></div>
+        <div class="cajero-contenedor">
+            <div class="pantalla-producto-izq" id="prod-izquierdo"></div>
+            <div class="ranura-signo" id="pantalla-operador">?</div>
+            <div class="pantalla-producto-der" id="prod-derecho"></div>
+        </div>
 
-        <div class="zona-balanza">
-            <div class="casilla-destino" id="casilla-izquierda" ondragover="permitirSoltar(event)" ondrop="soltarProducto(event, 'izq')">Coloca aquí</div>
-            <div class="signo-central">&lt;</div>
-            <div class="casilla-destino" id="casilla-derecha" ondragover="permitirSoltar(event)" ondrop="soltarProducto(event, 'der')">Coloca aquí</div>
+        <div class="teclado-signos" id="bloque-teclado">
+            <button class="btn-signo" onclick="seleccionarSigno('>')">&gt;</button>
+            <button class="btn-signo" onclick="seleccionarSigno('=')">=</button>
+            <button class="btn-signo" onclick="seleccionarSigno('<')">&lt;</button>
         </div>
 
         <div class="controles">
-            <button class="btn-accion" id="btn-validar" onclick="validarJuego()">Validar</button>
+            <button class="btn-accion" id="btn-validar" onclick="validarJuego()">Introducir Signo</button>
             <button class="btn-accion" id="btn-reintentar" onclick="reintentar()">Volver a intentar</button>
-            <button class="btn-accion" id="btn-siguiente" onclick="siguiente()">Siguiente Juego</button>
+            <button class="btn-accion" id="btn-siguiente" onclick="siguienteNivel()">Siguiente Nivel</button>
         </div>
         <div id="mensaje"></div>
     </div>
 
+    <div class="pantalla-final" id="contenedor-final">
+        <h2>🎉 ¡Desafío de Grandes Valores Terminado! 🎉</h2>
+        <p style="font-size: 20px;">¡Increíble! Lograste programar el cajero matemático sin errores.</p>
+        <div class="resultado-puntos">Sumaste +<span id="puntos-final">0</span> puntos a tu total</div>
+        <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
+        
+        <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
+            <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
+        </div>
+    </div>
+
     <script>
-        const productos = [
-            { id: "p5", nombre: "Bicicleta", precio: 8990, icono: "🚲" },
-            { id: "p6", nombre: "Libro", precio: 3500, icono: "📚" }
+        const niveles = [
+            {
+                titulo: "Juego 3 - Nivel 1: Grandes Valores",
+                instrucciones: "¡Compara con atención! Observa los precios y presiona el signo correcto en el teclado del cajero.",
+                audioSecuencia: [
+                    { texto: "En la caja verde de la izquierda tenemos un libro de 3.500 pesos.", resaltar: "prod-izquierdo" },
+                    { texto: "En el plato amarillo de la derecha tenemos una bicicleta de 8.990 pesos.", resaltar: "prod-derecho" },
+                    { texto: "Presiona el signo correcto en el teclado de abajo para programar el cajero.", resaltar: "bloque-teclado" }
+                ],
+                izq: { nombre: "Libro", precio: 3500, icono: "📚" },
+                der: { nombre: "Bicicleta", precio: 8990, icono: "🚲" },
+                respuestaCorrecta: "<",
+                textoExito: "¡Espectacular! 3.500 es MENOR QUE (<) 8.990.",
+                textoFallo: "Revisa bien las unidades de mil. El libro es más barato."
+            },
+            {
+                titulo: "Juego 3 - Nivel 2: Supermercado Tecnológico",
+                instrucciones: "Compara los precios de los aparatos electrónicos en las pantallas del cajero.",
+                audioSecuencia: [
+                    { texto: "En la caja verde de la izquierda hay una Tablet de 45.900 pesos.", resaltar: "prod-izquierdo" },
+                    { texto: "En el plato amarillo de la derecha hay unos audífonos de 12.500 pesos.", resaltar: "prod-derecho" },
+                    { texto: "Elige si la tablet es mayor, menor o igual utilizando los botones de abajo.", resaltar: "bloque-teclado" }
+                ],
+                izq: { nombre: "Tablet", precio: 45900, icono: "📱" },
+                der: { nombre: "Audífonos", precio: 12500, icono: "🎧" },
+                respuestaCorrecta: ">",
+                textoExito: "¡Excelente! 45.900 es MAYOR QUE (>) 12.500.",
+                textoFallo: "¡Vuelve a mirar! Cuarenta y cinco mil pesos es más dinero que doce mil pesos."
+            },
+            {
+                titulo: "Juego 3 - Nivel 3: El Desafío Gemelo",
+                instrucciones: "¡Atención a los dígitos! Compara los siguientes dos artículos de camping.",
+                audioSecuencia: [
+                    { texto: "En la caja verde de la izquierda hay una carpa de 34.000 pesos.", resaltar: "prod-izquierdo" },
+                    { texto: "En el plato amarillo de la derecha hay otra carpa idéntica de 34.000 pesos.", resaltar: "prod-derecho" },
+                    { texto: "Descubre qué signo corresponde para valores idénticos en el teclado.", resaltar: "bloque-teclado" }
+                ],
+                izq: { nombre: "Carpa Azul", precio: 34000, icono: "⛺" },
+                der: { nombre: "Carpa Verde", precio: 34000, icono: "⛺" },
+                respuestaCorrecta: "=",
+                textoExito: "¡Perfecto! Ambas cantidades son EXACTAMENTE IGUALES (=).",
+                textoFallo: "¡Cuidado! Ambos artículos valen exactamente treinta y cuatro mil pesos."
+            }
         ];
 
-        let puntaje = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
-        let prodIzq = null, prodDer = null, arrastrado = null;
+        let nivelActual = 0;
+        let puntosGanadosEsteJuego = 0;
+        let signoSeleccionado = null;
 
-        document.getElementById("puntos").innerText = puntaje;
-        cargarProductos();
+        function obtenerPuntajeGlobal() {
+            return parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+        }
 
-        function cargarProductos() {
-            const vitrina = document.getElementById("vitrina-productos");
-            vitrina.innerHTML = "";
-            productos.forEach(p => {
-                const div = document.createElement("div");
-                div.className = "tarjeta-producto";
-                div.id = p.id;
-                div.draggable = true;
-                div.ondragstart = () => { arrastrado = p; leerTexto(`Llevando ${p.nombre}`); };
-                div.onclick = () => leerTexto(`${p.nombre}, cuesta ${p.precio} pesos`);
-                div.innerHTML = `<div class="icono">${p.icono}</div><div class="nombre">${p.nombre}</div><div class="precio">$${p.precio}</div>`;
-                vitrina.appendChild(div);
+        function actualizarMarcadorVisual() {
+            document.getElementById("puntos").innerText = obtenerPuntajeGlobal();
+        }
+
+        function cargarNivel(numNivel) {
+            if (numNivel >= niveles.length) {
+                mostrarPantallaFinal();
+                return;
+            }
+
+            const datosNivel = niveles[numNivel];
+            signoSeleccionado = null;
+
+            document.getElementById("titulo-juego").innerText = datosNivel.titulo;
+            document.getElementById("instrucciones-juego").innerText = datosNivel.instrucciones;
+            document.getElementById("pantalla-operador").innerText = "?";
+            document.getElementById("mensaje").innerText = "";
+
+            document.getElementById("btn-validar").style.display = "inline-block";
+            document.getElementById("btn-reintentar").style.display = "none";
+            document.getElementById("btn-siguiente").style.display = "none";
+
+            const botones = document.querySelectorAll(".btn-signo");
+            botones.forEach(b => b.classList.remove("seleccionado"));
+
+            const divIzq = document.getElementById("prod-izquierdo");
+            const divDer = document.getElementById("prod-derecho");
+
+            divIzq.innerHTML = `<div class="icono">${datosNivel.izq.icono}</div><div class="nombre">${datosNivel.izq.nombre}</div><div class="precio">$${datosNivel.izq.precio}</div>`;
+            divDer.innerHTML = `<div class="icono">${datosNivel.der.icono}</div><div class="nombre">${datosNivel.der.nombre}</div><div class="precio">$${datosNivel.der.precio}</div>`;
+
+            actualizarMarcadorVisual();
+        }
+
+        function seleccionarSigno(signo) {
+            signoSeleccionado = signo;
+            document.getElementById("pantalla-operador").innerText = signo;
+            leerTextoSimple(`Elegiste el signo ${signo === '>' ? 'mayor que' : signo === '<' ? 'menor que' : 'igual a'}`);
+
+            const botones = document.querySelectorAll(".btn-signo");
+            botones.forEach(b => {
+                if (b.innerText === signo) {
+                    b.classList.add("seleccionado");
+                } else {
+                    b.classList.remove("seleccionado");
+                }
             });
         }
 
-        function permitirSoltar(ev) { ev.preventDefault(); }
-
-        function soltarProducto(ev, lado) {
-            ev.preventDefault();
-            const el = document.getElementById(arrastrado.id);
-            ev.currentTarget.innerHTML = "";
-            ev.currentTarget.appendChild(el);
-            ev.currentTarget.style.backgroundColor = "#e8f5e9";
-            if(lado === 'izq') prodIzq = arrastrado; else prodDer = arrastrado;
-            leerTexto(`Pusiste ${arrastrado.nombre}`);
-        }
-
         function validarJuego() {
-            if(!prodIzq || !prodDer) { leerTexto("Coloca ambos productos."); return; }
-            if(prodIzq.precio < prodDer.precio) {
-                document.getElementById("mensaje").innerText = "¡Excelente! El libro es menor que la bicicleta.";
+            if (!signoSeleccionado) {
+                leerTextoSimple("Por favor, selecciona un signo del teclado antes de continuar.");
+                return;
+            }
+
+            const datosNivel = niveles[nivelActual];
+
+            if (signoSeleccionado === datosNivel.respuestaCorrecta) {
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                
+                document.getElementById("mensaje").innerText = datosNivel.textoExito;
                 document.getElementById("mensaje").style.color = "green";
-                leerTexto("Muy bien, correcto. Presiona siguiente juego.");
+                leerTextoSimple("¡Excelente! Es la respuesta correcta. Presiona el botón para avanzar.");
+
+                puntosGanadosEsteJuego += 10;
+                let nuevoTotal = obtenerPuntajeGlobal() + 10;
+                localStorage.setItem("puntajeAcumulado", nuevoTotal);
+                actualizarMarcadorVisual();
+
                 document.getElementById("btn-validar").style.display = "none";
                 document.getElementById("btn-siguiente").style.display = "inline-block";
             } else {
-                document.getElementById("mensaje").innerText = "¡Inténtalo nuevamente!";
+                document.getElementById("mensaje").innerText = datosNivel.textoFallo;
                 document.getElementById("mensaje").style.color = "red";
-                leerTexto("Inténtalo nuevamente.");
+                leerTextoSimple("Ese signo no es el correcto. Inténtalo de nuevo.");
+
+                const pantallaOp = document.getElementById("pantalla-operador");
+                pantallaOp.style.transform = "translateX(-10px)";
+                setTimeout(() => pantallaOp.style.transform = "translateX(10px)", 100);
+                setTimeout(() => pantallaOp.style.transform = "translateX(0)", 200);
+
                 document.getElementById("btn-validar").style.display = "none";
                 document.getElementById("btn-reintentar").style.display = "inline-block";
             }
         }
 
         function reintentar() {
-            prodIzq = null; prodDer = null;
-            document.getElementById("casilla-izquierda").innerHTML = "Coloca aquí";
-            document.getElementById("casilla-derecha").innerHTML = "Coloca aquí";
-            document.getElementById("casilla-izquierda").style.backgroundColor = "#f5f5f5";
-            document.getElementById("casilla-derecha").style.backgroundColor = "#f5f5f5";
             document.getElementById("btn-validar").style.display = "inline-block";
             document.getElementById("btn-reintentar").style.display = "none";
             document.getElementById("mensaje").innerText = "";
-            cargarProductos();
+            cargarNivel(nivelActual);
         }
 
-        function siguiente() {
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-            setTimeout(() => {
-                puntaje += 10;
-                localStorage.setItem("puntajeAcumulado", puntaje);
-                window.location.href = "juego4.html"; // Redirecciona de forma secuencial al Juego 4
-            }, 600);
+        function siguienteNivel() {
+            window.speechSynthesis.cancel();
+            nivelActual++;
+            cargarNivel(nivelActual);
         }
 
-        function leerTexto(t) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang='es-ES'; window.speechSynthesis.speak(u); }
-        function leerIndicaciones() { leerTexto("Arrastra los productos para que el de la izquierda sea menor que el de la derecha."); }
+        function mostrarPantallaFinal() {
+            document.getElementById("contenedor-juego").style.display = "none";
+            document.getElementById("contenedor-final").style.display = "block";
+            document.getElementById("puntos-final").innerText = puntosGanadosEsteJuego;
+
+            const txtEvaluacion = document.getElementById("mensaje-final-evaluacion");
+            txtEvaluacion.innerText = "🏆 ¡Fabuloso! Tus puntos se han guardado de forma global.";
+            txtEvaluacion.style.color = "green";
+
+            leerTextoSimple("¡Felicitaciones! Has terminado el juego del cajero. Presiona el botón para regresar.");
+        }
+
+        function leerSecuencia(secuencia, indice = 0) {
+            if (indice >= secuencia.length) return;
+
+            const paso = secuencia[indice];
+            const elementoHTML = document.getElementById(paso.resaltar);
+
+            const u = new SpeechSynthesisUtterance(paso.texto);
+            u.lang = 'es-ES';
+
+            u.onstart = () => {
+                if (elementoHTML) elementoHTML.classList.add("efecto-hablar");
+            };
+
+            u.onend = () => {
+                if (elementoHTML) elementoHTML.classList.remove("efecto-hablar");
+                leerSecuencia(secuencia, indice + 1);
+            };
+
+            window.speechSynthesis.speak(u);
+        }
+
+        function leerTextoSimple(t) { 
+            window.speechSynthesis.cancel(); 
+            const u = new SpeechSynthesisUtterance(t); 
+            u.lang = 'es-ES'; 
+            window.speechSynthesis.speak(u); 
+        }
+
+        function leerIndicaciones() { 
+            window.speechSynthesis.cancel();
+            document.getElementById("prod-izquierdo").classList.remove("efecto-hablar");
+            document.getElementById("prod-derecho").classList.remove("efecto-hablar");
+            document.getElementById("bloque-teclado").classList.remove("efecto-hablar");
+
+            if(document.getElementById("contenedor-juego").style.display !== "none") {
+                leerSecuencia(niveles[nivelActual].audioSecuencia); 
+            } else {
+                leerTextoSimple("Fin del juego. Presiona el botón para ir a tu menú.");
+            }
+        }
+
+        function irAMenu() {
+            window.speechSynthesis.cancel();
+            window.location.href = "4basico.html"; 
+        }
+
+        window.onload = () => {
+            cargarNivel(0);
+        };
     </script>
 </body>
 </html>

@@ -6,26 +6,42 @@
     <title>Tienda Matemática: Juego 2</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* El mismo CSS del Juego 1 para mantener la coherencia visual */
         body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #e8f5e9; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
         #marcador { position: absolute; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; }
-        .pantalla-juego { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 80%; max-width: 700px; }
+        .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 85%; max-width: 700px; }
+        .pantalla-final { display: none; }
         h2 { color: #2e7d32; margin-top: 0; }
-        .vitrina { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; background: #f1f8e9; padding: 20px; border-radius: 15px; border: 2px dashed #a5d6a7; min-height: 140px; }
+        
+        .vitrina { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; background: #f1f8e9; padding: 20px; border-radius: 15px; border: 2px dashed #a5d6a7; min-height: 140px; transition: transform 0.3s ease, border-color 0.3s ease; }
         .tarjeta-producto { background: white; border: 2px solid #81c784; border-radius: 10px; padding: 10px; width: 110px; text-align: center; cursor: grab; }
         .tarjeta-producto .icono { font-size: 45px; }
         .tarjeta-producto .nombre { font-size: 16px; font-weight: bold; }
         .tarjeta-producto .precio { font-size: 18px; color: #e65100; font-weight: bold; }
+        
         .zona-balanza { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; }
-        .casilla-destino { width: 140px; height: 160px; border: 4px dashed #9e9e9e; border-radius: 15px; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center; color: #757575; }
+        .casilla-destino { width: 140px; height: 160px; border: 4px dashed #9e9e9e; border-radius: 15px; background-color: #f5f5f5; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #757575; transition: transform 0.3s ease, border-color 0.3s ease; font-weight: bold; padding: 5px; }
         .signo-central { font-size: 80px; font-weight: bold; color: #2e7d32; }
+        
+        @keyframes palpitar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(46, 125, 50, 0.4); }
+            100% { transform: scale(1); }
+        }
+        .efecto-hablar {
+            animation: palpitar 0.8s ease-in-out 2;
+            border-color: #2e7d32 !important;
+        }
+
         .controles { display: flex; gap: 20px; justify-content: center; }
         button.btn-accion { padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; }
         #btn-validar { background-color: #2ec4b6; }
         #btn-reintentar { background-color: #e71d36; display: none; }
         #btn-siguiente { background-color: #ff9f1c; display: none; }
+        .btn-menu { background-color: #795548; }
+        .btn-reiniciar { background-color: #4caf50; }
         #mensaje { margin-top: 20px; font-size: 24px; font-weight: bold; }
+        .resultado-puntos { font-size: 32px; color: #2e7d32; margin: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -33,105 +49,291 @@
     <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
     <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <div class="pantalla-juego">
-        <h2>Juego 2: Buscando el más caro</h2>
-        <p style="font-weight: bold; color: #555;">¡Ordena la vitrina! Arrastra los elementos de manera que se cumpla el signo MAYOR QUE (&gt;).</p>
+    <div class="pantalla-juego" id="contenedor-juego">
+        <h2 id="titulo-juego">Juego 2: Buscando el más caro</h2>
+        <p id="instrucciones-juego" style="font-weight: bold; color: #555;"></p>
         
         <div class="vitrina" id="vitrina-productos"></div>
 
         <div class="zona-balanza">
             <div class="casilla-destino" id="casilla-izquierda" ondragover="permitirSoltar(event)" ondrop="soltarProducto(event, 'izq')">Coloca aquí</div>
-            <div class="signo-central">&gt;</div>
+            <div class="signo-central" id="simbolo-comparacion">&gt;</div>
             <div class="casilla-destino" id="casilla-derecha" ondragover="permitirSoltar(event)" ondrop="soltarProducto(event, 'der')">Coloca aquí</div>
         </div>
 
         <div class="controles">
-            <button class="btn-accion" id="btn-validar" onclick="validarJuego()">Validar</button>
+            <button class="btn-accion" id="btn-validar" onclick="validarJuego()">Verificar</button>
             <button class="btn-accion" id="btn-reintentar" onclick="reintentar()">Volver a intentar</button>
-            <button class="btn-accion" id="btn-siguiente" onclick="siguiente()">Siguiente Juego</button>
+            <button class="btn-accion" id="btn-siguiente" onclick="siguienteNivel()">Siguiente Nivel</button>
         </div>
         <div id="mensaje"></div>
     </div>
 
+    <div class="pantalla-final" id="contenedor-final">
+        <h2>🎉 ¡Desafío de la Tienda Completado! 🎉</h2>
+        <p style="font-size: 20px;">Has organizado los productos de la tienda con éxito.</p>
+        <div class="resultado-puntos">Sumaste +<span id="puntos-final">0</span> puntos a tu menú</div>
+        <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
+        
+        <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
+            <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
+        </div>
+    </div>
+
     <script>
-        const productos = [
-            { id: "p3", nombre: "Pelota", precio: 4500, icono: "⚽" },
-            { id: "p4", nombre: "Gorra", precio: 2800, icono: "🧢" }
+        const niveles = [
+            {
+                titulo: "Juego 2 - Nivel 1: El más caro",
+                instrucciones: "¡Ordena la vitrina! Arrastra los elementos de manera que el producto de la IZQUIERDA sea MAYOR QUE (>) el de la DERECHA.",
+                audioSecuencia: [
+                    { texto: "Mira la vitrina de arriba con los productos.", resaltar: "vitrina-productos" },
+                    { texto: "Arrastra el producto más caro a la casilla izquierda...", resaltar: "casilla-izquierda" },
+                    { texto: "...y el producto más barato a la casilla derecha para que sea mayor que.", resaltar: "casilla-derecha" }
+                ],
+                productos: [
+                    { id: "p3", nombre: "Pelota", precio: 4500, icono: "⚽" },
+                    { id: "p4", nombre: "Gorra", precio: 2800, icono: "🧢" }
+                ],
+                signo: ">",
+                validar: (izq, der) => izq.precio > der.precio,
+                textoExito: "¡Excelente! La pelota ($4500) es más cara que la gorra ($2800).",
+                textoFallo: "¡Uh oh! El producto de la izquierda debe tener un precio mayor que el de la derecha."
+            },
+            {
+                titulo: "Juego 2 - Nivel 2: Ofertas de tecnología",
+                instrucciones: "¡Ordena la vitrina! Arrastra los elementos de manera que el producto de la IZQUIERDA sea MENOR QUE (<) el de la DERECHA.",
+                audioSecuencia: [
+                    { texto: "Observa los precios en la vitrina.", resaltar: "vitrina-productos" },
+                    { texto: "Coloca el producto más económico en la casilla izquierda...", resaltar: "casilla-izquierda" },
+                    { texto: "...y el producto más costoso en la casilla derecha para cumplir el signo menor que.", resaltar: "casilla-derecha" }
+                ],
+                productos: [
+                    { id: "p5", nombre: "Audífonos", precio: 12500, icono: "🎧" },
+                    { id: "p6", nombre: "Reloj", precio: 24900, icono: "⌚" }
+                ],
+                signo: "<",
+                validar: (izq, der) => izq.precio < der.precio,
+                textoExito: "¡Genial! Los audífonos ($12500) son más baratos que el reloj ($24900).",
+                textoFallo: "¡Inténtalo otra vez! El precio de la izquierda debe ser menor que el de la derecha."
+            },
+            {
+                titulo: "Juego 2 - Nivel 3: El balance del súper",
+                instrucciones: "¡Ordena la vitrina! Arrastra los elementos de manera que se cumpla el signo MAYOR QUE (>) en la balanza.",
+                audioSecuencia: [
+                    { texto: "Revisa las cosas ricas de la vitrina.", resaltar: "vitrina-productos" },
+                    { texto: "Pon el de mayor valor a la izquierda...", resaltar: "casilla-izquierda" },
+                    { texto: "...y el de menor valor a la derecha.", resaltar: "casilla-derecha" }
+                ],
+                productos: [
+                    { id: "p7", nombre: "Chocolate", precio: 3200, icono: "🍫" },
+                    { id: "p8", nombre: "Leche", precio: 1100, icono: "🥛" }
+                ],
+                signo: ">",
+                validar: (izq, der) => izq.precio > der.precio,
+                textoExito: "¡Perfecto! El chocolate ($3200) vale más que la leche ($1100).",
+                textoFallo: "Recuerda revisar bien los números de los precios antes de comparar."
+            }
         ];
 
-        let puntaje = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+        let nivelActual = 0;
+        let puntosGanadosEsteJuego = 0;
         let prodIzq = null, prodDer = null, arrastrado = null;
 
-        document.getElementById("puntos").innerText = puntaje;
-        cargarProductos();
+        // Cargar lo que ya se acumuló previamente en el Juego 1
+        function obtenerPuntajeGlobal() {
+            return parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+        }
 
-        function cargarProductos() {
+        function actualizarMarcadorVisual() {
+            document.getElementById("puntos").innerText = obtenerPuntajeGlobal();
+        }
+
+        function cargarNivel(numNivel) {
+            if (numNivel >= niveles.length) {
+                mostrarPantallaFinal();
+                return;
+            }
+
+            const datosNivel = niveles[numNivel];
+            
+            document.getElementById("titulo-juego").innerText = datosNivel.titulo;
+            document.getElementById("instrucciones-juego").innerText = datosNivel.instrucciones;
+            document.getElementById("simbolo-comparacion").innerText = datosNivel.signo;
+            document.getElementById("mensaje").innerText = "";
+            
+            document.getElementById("btn-validar").style.display = "inline-block";
+            document.getElementById("btn-reintentar").style.display = "none";
+            document.getElementById("btn-siguiente").style.display = "none";
+
+            prodIzq = null;
+            prodDer = null;
+
+            const casIzq = document.getElementById("casilla-izquierda");
+            const casDer = document.getElementById("casilla-derecha");
+            casIzq.innerHTML = "Coloca aquí";
+            casDer.innerHTML = "Coloca aquí";
+            casIzq.style.backgroundColor = "#f5f5f5";
+            casDer.style.backgroundColor = "#f5f5f5";
+
             const vitrina = document.getElementById("vitrina-productos");
             vitrina.innerHTML = "";
-            productos.forEach(p => {
+            
+            datosNivel.productos.forEach(p => {
                 const div = document.createElement("div");
                 div.className = "tarjeta-producto";
                 div.id = p.id;
                 div.draggable = true;
-                div.ondragstart = () => { arrastrado = p; leerTexto(`Llevando ${p.nombre}`); };
-                div.onclick = () => leerTexto(`${p.nombre}, cuesta ${p.precio} pesos`);
+                div.ondragstart = () => { 
+                    arrastrado = p; 
+                    leerTextoSimple(`Llevando ${p.nombre}`); 
+                };
+                div.onclick = () => leerTextoSimple(`${p.nombre}, cuesta ${p.precio} pesos`);
                 div.innerHTML = `<div class="icono">${p.icono}</div><div class="nombre">${p.nombre}</div><div class="precio">$${p.precio}</div>`;
                 vitrina.appendChild(div);
             });
+
+            actualizarMarcadorVisual();
         }
 
         function permitirSoltar(ev) { ev.preventDefault(); }
 
         function soltarProducto(ev, lado) {
             ev.preventDefault();
+            if (!arrastrado) return;
+            
             const el = document.getElementById(arrastrado.id);
             ev.currentTarget.innerHTML = "";
             ev.currentTarget.appendChild(el);
             ev.currentTarget.style.backgroundColor = "#e8f5e9";
-            if(lado === 'izq') prodIzq = arrastrado; else prodDer = arrastrado;
-            leerTexto(`Pusiste ${arrastrado.nombre}`);
+            
+            if (lado === 'izq') {
+                prodIzq = arrastrado;
+            } else {
+                prodDer = arrastrado;
+            }
+            leerTextoSimple(`Pusiste ${arrastrado.nombre}`);
         }
 
         function validarJuego() {
-            if(!prodIzq || !prodDer) { leerTexto("Coloca ambos productos."); return; }
-            if(prodIzq.precio > prodDer.precio) {
-                document.getElementById("mensaje").innerText = "¡Excelente! La pelota es más cara que la gorra.";
+            if (!prodIzq || !prodDer) { 
+                leerTextoSimple("Coloca ambos productos antes de verificar."); 
+                return; 
+            }
+            
+            const datosNivel = niveles[nivelActual];
+            
+            if (datosNivel.validar(prodIzq, prodDer)) {
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                
+                document.getElementById("mensaje").innerText = datosNivel.textoExito;
                 document.getElementById("mensaje").style.color = "green";
-                leerTexto("Muy bien, correcto. Presiona siguiente juego.");
+                leerTextoSimple("¡Excelente trabajo! Es correcto.");
+                
+                // 1. Sumar los 10 puntos locales
+                puntosGanadosEsteJuego += 10;
+                
+                // 2. Sumar al acumulado total de la sesión y persistirlo inmediatamente
+                let nuevoTotal = obtenerPuntajeGlobal() + 10;
+                localStorage.setItem("puntajeAcumulado", nuevoTotal);
+                
+                // 3. Actualizar la interfaz arriba a la derecha
+                actualizarMarcadorVisual();
+
                 document.getElementById("btn-validar").style.display = "none";
                 document.getElementById("btn-siguiente").style.display = "inline-block";
             } else {
-                document.getElementById("mensaje").innerText = "¡Inténtalo nuevamente!";
+                document.getElementById("mensaje").innerText = datosNivel.textoFallo;
                 document.getElementById("mensaje").style.color = "red";
-                leerTexto("Inténtalo nuevamente.");
+                leerTextoSimple("Oh, esa posición no es correcta. Inténtalo de nuevo.");
+                
+                document.getElementById("casilla-izquierda").style.transform = "scale(0.95)";
+                document.getElementById("casilla-derecha").style.transform = "scale(0.95)";
+                setTimeout(() => {
+                    document.getElementById("casilla-izquierda").style.transform = "scale(1)";
+                    document.getElementById("casilla-derecha").style.transform = "scale(1)";
+                }, 200);
+
                 document.getElementById("btn-validar").style.display = "none";
                 document.getElementById("btn-reintentar").style.display = "inline-block";
             }
         }
 
         function reintentar() {
-            prodIzq = null; prodDer = null;
-            document.getElementById("casilla-izquierda").innerHTML = "Coloca aquí";
-            document.getElementById("casilla-derecha").innerHTML = "Coloca aquí";
-            document.getElementById("casilla-izquierda").style.backgroundColor = "#f5f5f5";
-            document.getElementById("casilla-derecha").style.backgroundColor = "#f5f5f5";
             document.getElementById("btn-validar").style.display = "inline-block";
             document.getElementById("btn-reintentar").style.display = "none";
             document.getElementById("mensaje").innerText = "";
-            cargarProductos();
+            cargarNivel(nivelActual);
         }
 
-        function siguiente() {
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-            setTimeout(() => {
-                puntaje += 10;
-                localStorage.setItem("puntajeAcumulado", puntaje);
-                window.location.href = "juego3.html";
-            }, 600);
+        function siguienteNivel() {
+            window.speechSynthesis.cancel();
+            nivelActual++;
+            cargarNivel(nivelActual);
         }
 
-        function leerTexto(t) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang='es-ES'; window.speechSynthesis.speak(u); }
-        function leerIndicaciones() { leerTexto("Arrastra los productos para que el de la izquierda sea mayor que el de la derecha."); }
+        function mostrarPantallaFinal() {
+            document.getElementById("contenedor-juego").style.display = "none";
+            document.getElementById("contenedor-final").style.display = "block";
+            
+            // Mostrar cuánto aportó este juego específico
+            document.getElementById("puntos-final").innerText = puntosGanadosEsteJuego;
+
+            const txtEvaluacion = document.getElementById("mensaje-final-evaluacion");
+            txtEvaluacion.innerText = "🏆 ¡Puntaje guardado con éxito en tu menú global!";
+            txtEvaluacion.style.color = "green";
+            
+            leerTextoSimple("¡Felicitaciones! Has completado los niveles de la tienda. Presiona el botón para volver.");
+        }
+
+        function leerSecuencia(secuencia, indice = 0) {
+            if (indice >= secuencia.length) return;
+
+            const paso = secuencia[indice];
+            const elementoHTML = document.getElementById(paso.resaltar);
+
+            const u = new SpeechSynthesisUtterance(paso.texto);
+            u.lang = 'es-ES';
+
+            u.onstart = () => {
+                if (elementoHTML) elementoHTML.classList.add("efecto-hablar");
+            };
+
+            u.onend = () => {
+                if (elementoHTML) elementoHTML.classList.remove("efecto-hablar");
+                leerSecuencia(secuencia, indice + 1);
+            };
+
+            window.speechSynthesis.speak(u);
+        }
+
+        function leerTextoSimple(t) { 
+            window.speechSynthesis.cancel(); 
+            const u = new SpeechSynthesisUtterance(t); 
+            u.lang = 'es-ES'; 
+            window.speechSynthesis.speak(u); 
+        }
+
+        function leerIndicaciones() { 
+            window.speechSynthesis.cancel();
+            document.getElementById("vitrina-productos").classList.remove("efecto-hablar");
+            document.getElementById("casilla-izquierda").classList.remove("efecto-hablar");
+            document.getElementById("casilla-derecha").classList.remove("efecto-hablar");
+
+            if(document.getElementById("contenedor-juego").style.display !== "none") {
+                leerSecuencia(niveles[nivelActual].audioSecuencia); 
+            } else {
+                leerTextoSimple("Fin del juego de la tienda. Elige una opción en pantalla.");
+            }
+        }
+
+        function irAMenu() {
+            window.speechSynthesis.cancel();
+            window.location.href = "4basico.html"; 
+        }
+
+        window.onload = () => {
+            cargarNivel(0);
+        };
     </script>
 </body>
 </html>

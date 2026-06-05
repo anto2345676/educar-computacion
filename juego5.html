@@ -3,248 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda Matemática: Juego 5</title>
+    <title>Tienda Matemática: Juego 5 (Globos Relámpago)</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body {
-            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
-            background-color: #e8f5e9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
+        body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #e0f7fa; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        
+        #marcador { position: absolute; top: 20px; right: 20px; background-color: #00acc1; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; }
+        
+        .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 35px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); width: 85%; max-width: 700px; box-sizing: border-box; }
+        .pantalla-final { display: none; }
+        h2 { color: #006064; margin-top: 0; }
+
+        /* Panel de Operación */
+        .panel-operacion { display: flex; align-items: center; justify-content: center; gap: 20px; background: #f5f5f5; border: 3px solid #b2ebf2; padding: 25px; border-radius: 20px; margin: 25px 0; min-height: 100px; }
+        .bloque-num { font-size: 38px; font-weight: bold; color: #263238; padding: 10px 15px; border-radius: 10px; background: white; border: 2px solid #cfd8dc; transition: transform 0.3s ease; }
+        .incognita-central { width: 90px; height: 90px; background: #006064; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 45px; font-weight: bold; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); transition: transform 0.3s ease; }
+
+        /* Zona de Globos Voladores */
+        .cielo-globos { display: flex; justify-content: space-around; align-items: center; height: 180px; margin-top: 20px; background: linear-gradient(to bottom, #e0f7fa, #fff); border-radius: 15px; border: 2px dashed #00bcd4; padding: 10px; position: relative; overflow: hidden; }
+        
+        .globo { width: 95px; height: 115px; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; color: white; cursor: pointer; position: relative; user-select: none; transition: transform 0.2s ease, opacity 0.2s ease, filter 0.2s ease; animation: flotarMovimiento 3s ease-in-out infinite alternate; }
+        
+        /* Pequeño nudo del globo abajo */
+        .globo::after { content: ""; position: absolute; bottom: -8px; left: 42px; border-left: 6px solid transparent; border-right: 6px solid transparent; transition: opacity 0.1s ease; }
+        
+        /* Efecto de Reventado */
+        .globo.reventado {
+            transform: scale(1.6) !important;
+            opacity: 0 !important;
+            filter: blur(5px);
+            pointer-events: none;
         }
-        #marcador {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: #4caf50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .globo.reventado::after {
+            opacity: 0 !important;
         }
-        #btn-parlante {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 40px;
-            cursor: pointer;
-            background: none;
-            border: none;
+        
+        /* Colores individuales de globos */
+        #globo-mayor { background-color: #ff5252; box-shadow: inset -8px -8px 0 rgba(0,0,0,0.15); }
+        #globo-mayor::after { border-bottom: 8px solid #ff5252; }
+        #globo-igual { background-color: #4caf50; box-shadow: inset -8px -8px 0 rgba(0,0,0,0.15); }
+        #globo-igual::after { border-bottom: 8px solid #4caf50; }
+        #globo-menor { background-color: #2196f3; box-shadow: inset -8px -8px 0 rgba(0,0,0,0.15); }
+        #globo-menor::after { border-bottom: 8px solid #2196f3; }
+
+        /* Variaciones de velocidad de animación para desfasar los globos */
+        #globo-mayor { animation-delay: 0s; }
+        #globo-igual { animation-delay: 0.6s; }
+        #globo-menor { animation-delay: 1.2s; }
+
+        @keyframes flotarMovimiento {
+            0% { transform: translateY(15px) rotate(-3deg); }
+            100% { transform: translateY(-15px) rotate(3deg); }
         }
-        .pantalla-juego {
-            text-align: center;
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            width: 80%;
-            max-width: 700px;
+
+        /* Animación de Pálpito corporativa */
+        @keyframes palpitar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(0, 96, 100, 0.4); }
+            100% { transform: scale(1); }
         }
-        h2 { color: #2e7d32; margin-top: 0; }
-        .vitrina {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
-            background: #f1f8e9;
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px dashed #a5d6a7;
-            min-height: 140px;
+        .efecto-hablar {
+            animation: palpitar 0.8s ease-in-out 2 !important;
+            border-color: #00bcd4 !important;
+            color: #00bcd4 !important;
         }
-        .tarjeta-producto {
-            background: white;
-            border: 2px solid #81c784;
-            border-radius: 10px;
-            padding: 10px;
-            width: 110px;
-            text-align: center;
-            cursor: grab;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .tarjeta-producto .icono { font-size: 45px; margin-bottom: 5px; }
-        .tarjeta-producto .nombre { font-size: 16px; font-weight: bold; color: #333; }
-        .tarjeta-producto .precio { font-size: 18px; color: #e65100; font-weight: bold; }
-        .zona-balanza { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; }
-        .casilla-destino {
-            width: 140px;
-            height: 160px;
-            border: 4px dashed #9e9e9e;
-            border-radius: 15px;
-            background-color: #f5f5f5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: #757575;
-            overflow: hidden;
-        }
-        .signo-central { font-size: 80px; font-weight: bold; color: #2e7d32; width: 80px; }
-        .controles { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
-        .btn-accion { padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; }
-        #btn-validar { background-color: #2ec4b6; }
-        #btn-reintentar { background-color: #e71d36; display: none; }
+
+        .controles { display: flex; gap: 20px; justify-content: center; margin-top: 25px; }
+        button.btn-accion { padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; box-shadow: 0 4px rgba(0,0,0,0.2); }
+        button.btn-accion:active { transform: translateY(2px); box-shadow: none; }
         #btn-siguiente { background-color: #ff9f1c; display: none; }
+        #btn-reintentar { background-color: #e71d36; display: none; }
+        .btn-menu { background-color: #795548; }
+
         #mensaje { margin-top: 20px; font-size: 24px; font-weight: bold; }
+        .resultado-puntos { font-size: 32px; color: #006064; margin: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
-    <div id="marcador">⭐ Puntos Partida: <span id="puntos">0</span></div>
+    <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <div class="pantalla-juego">
-        <h2 id="titulo-nivel">Nivel 1</h2>
-        <p style="font-weight: bold; color: #555;">Productos disponibles (Arrástralos hacia abajo):</p>
-        <div class="vitrina" id="vitrina-productos"></div>
+    <div class="pantalla-juego" id="contenedor-juego">
+        <h2 id="titulo-juego">Juego 5: Los Globos Relámpago</h2>
+        <p id="instrucciones-juego" style="font-weight: bold; color: #555;"></p>
+        
+        <div class="panel-operacion">
+            <div class="bloque-num" id="bloque-izq">0</div>
+            <div class="incognita-central" id="bloque-signo">?</div>
+            <div class="bloque-num" id="bloque-der">0</div>
+        </div>
 
-        <div class="zona-balanza">
-            <div class="casilla-destino" id="casilla-izquierda" ondragover="permitirSoltar(event)" ondrop="soltarProducto(event, 'izq')">Coloca aquí</div>
-            <div class="signo-central" id="signo-fijo">?</div>
-            <div class="casilla-destino" id="casilla-derecha" ondragover="permitirSoltar(event)" ondrop="soltarProducto(event, 'der')">Coloca aquí</div>
+        <p style="font-weight: bold; color: #006064;">¡Revienta el globo con la respuesta correcta!</p>
+        <div class="cielo-globos" id="zona-vuelo">
+            <div class="globo" id="globo-mayor" onclick="intentarReviento(this, '>')">&gt;</div>
+            <div class="globo" id="globo-igual" onclick="intentarReviento(this, '=')">=</div>
+            <div class="globo" id="globo-menor" onclick="intentarReviento(this, '<')">&lt;</div>
         </div>
 
         <div class="controles">
-            <button class="btn-accion" id="btn-validar" onclick="validarTienda()">Validar</button>
-            <button class="btn-accion" id="btn-reintentar" onclick="reintentarNivel()">Volver a intentar</button>
-            <button class="btn-accion" id="btn-siguiente" onclick="siguienteNivel()">Siguiente Nivel</button>
+            <button class="btn-accion" id="btn-reintentar" onclick="reintentar()">Volver a intentar</button>
+            <button class="btn-accion" id="btn-siguiente" onclick="siguienteNivel()">Siguiente Desafío</button>
         </div>
         <div id="mensaje"></div>
     </div>
 
+    <div class="pantalla-final" id="contenedor-final">
+        <h2>🎈 ¡Festival de Globos Completado! 🎈</h2>
+        <p style="font-size: 20px;">¡Magnífico! Tu agilidad mental matemática resolvió todos los niveles.</p>
+        <div class="resultado-puntos">Ganaste +<span id="puntos-final">0</span> puntos para tu registro</div>
+        <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
+        
+        <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
+            <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
+        </div>
+    </div>
+
     <script>
         const niveles = [
-            { signo: ">", p1: { id: "p1", nombre: "Leche", precio: 1200, icono: "🥛" }, p2: { id: "p2", nombre: "Pan", precio: 800, icono: "🍞" } },
-            { signo: "<", p1: { id: "p3", nombre: "Manzana", precio: 500, icono: "🍎" }, p2: { id: "p4", nombre: "Chocolate", precio: 1500, icono: "🍫" } },
-            { signo: ">", p1: { id: "p5", nombre: "Zapatos", precio: 8500, icono: "👟" }, p2: { id: "p6", nombre: "Calcetines", precio: 2300, icono: "🧦" } },
-            { signo: "<", p1: { id: "p7", nombre: "Lápiz", precio: 450, icono: "✏️" }, p2: { id: "p8", nombre: "Mochila", precio: 9990, icono: "🎒" } }
+            {
+                titulo: "Juego 5 - Nivel 1: Sumas v/s Precios",
+                instrucciones: "Resuelve mentalmente la operation para saber qué lado es mayor.",
+                audioSecuencia: [
+                    { texto: "En el lado izquierdo hay tres mil quinientos pesos.", resaltar: "bloque-izq" },
+                    { texto: "En el lado derecho hay una suma de dos mil más mil quinientos pesos.", resaltar: "bloque-der" },
+                    { texto: "Calcula y pincha el globo del signo correcto en el cielo.", resaltar: "zona-vuelo" }
+                ],
+                textoIzq: "3.500",
+                textoDer: "2.000 + 1.500",
+                valIzq: 3500,
+                valDer: 3500,
+                correcto: "=",
+                exito: "¡Perfecto! Tres mil quinientos es IGUAL (=) a dos mil más mil quinientos.",
+                fallo: "¡Suma con cuidado! Dos mil más mil quinientos da exactamente tres mil quinientos."
+            },
+            {
+                titulo: "Juego 5 - Nivel 2: Desafío de la Resta",
+                instrucciones: "¡Rápido! Resta los valores antes de elegir tu globo.",
+                audioSecuencia: [
+                    { texto: "A la izquierda tenemos un total directo de cinco mil pesos.", resaltar: "bloque-izq" },
+                    { texto: "A la derecha tenemos ocho mil menos cuatro mil pesos.", resaltar: "bloque-der" },
+                    { texto: "Revienta el globo operador que corresponda.", resaltar: "zona-vuelo" }
+                ],
+                textoIzq: "5.000",
+                textoDer: "8.000 - 4.000",
+                valIzq: 5000,
+                valDer: 4000,
+                correcto: ">",
+                exito: "¡Excelente! Cinco mil es MAYOR QUE (>) cuatro mil.",
+                fallo: "Ojo: Ocho mil menos cuatro mil resulta en cuatro mil. Cinco mil le gana."
+            },
+            {
+                titulo: "Juego 5 - Nivel 3: Grandes Centenas",
+                instrucciones: "Analiza bien el valor posicional de las cantidades numéricas.",
+                audioSecuencia: [
+                    { texto: "Lado izquierdo: doce mil cuatrocientos pesos.", resaltar: "bloque-izq" },
+                    { texto: "Lado derecho: doce mil setecientos pesos.", resaltar: "bloque-der" },
+                    { texto: "Busca rápidamente el globo correcto.", resaltar: "zona-vuelo" }
+                ],
+                textoIzq: "12.400",
+                textoDer: "12.700",
+                valIzq: 12400,
+                valDer: 12700,
+                correcto: "<",
+                exito: "¡Impresionante! Doce mil cuatrocientos es MENOR QUE (<) doce mil setecientos.",
+                fallo: "Compara las centenas: cuatrocientos es menor que setecientos."
+            },
+            {
+                titulo: "Juego 5 - Nivel 4: El Gran Reto Final",
+                instrucciones: "¡Último nivel! Concentración total en los dígitos acumulados.",
+                audioSecuencia: [
+                    { texto: "Izquierda: veinticinco mil más cinco mil.", resaltar: "bloque-izq" },
+                    { texto: "Derecha: un billete limpio de treinta y un mil.", resaltar: "bloque-der" },
+                    { texto: "Finaliza el juego pinchando el último globo.", resaltar: "zona-vuelo" }
+                ],
+                textoIzq: "25.000 + 5.000",
+                textoDer: "31.000",
+                valIzq: 30000,
+                valDer: 31000,
+                correcto: "<",
+                exito: "¡Espectacular! Treinta mil es MENOR QUE (<) treinta y un mil.",
+                fallo: "Veinticinco mil más cinco mil es treinta mil. Treinta y un mil es mayor."
+            }
         ];
 
         let nivelActual = 0;
-        let puntajeJuegoActual = 0;
-        let productoEnIzquierda = null;
-        let productoEnDerecha = null;
-        let productoSiendoArrastrado = null;
+        let puntosGanadosEsteJuego = 0;
+        let juegoBloqueado = false;
 
-        cargarNivel();
+        function obtenerPuntajeGlobal() {
+            return parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+        }
 
-        function cargarNivel() {
-            if (nivelActual >= niveles.length) {
-                terminarJuego();
+        function actualizarMarcadorVisual() {
+            document.getElementById("puntos").innerText = obtenerPuntajeGlobal();
+        }
+
+        // Sintetizador de sonido pop nativo por código (sin archivos externos)
+        function reproducirSonidoPop() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.08);
+                
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + 0.08);
+            } catch (e) { console.log("AudioContext no soportado aún."); }
+        }
+
+        function cargarNivel(numNivel) {
+            if (numNivel >= niveles.length) {
+                mostrarPantallaFinal();
                 return;
             }
 
-            document.getElementById("puntos").innerText = puntajeJuegoActual;
-            document.getElementById("titulo-nivel").innerText = `Nivel ${nivelActual + 1}`;
-            document.getElementById("signo-fijo").innerText = niveles[nivelActual].signo;
-            
-            productoEnIzquierda = null;
-            productoEnDerecha = null;
-            
-            const casIzq = document.getElementById("casilla-izquierda");
-            const casDer = document.getElementById("casilla-derecha");
-            casIzq.innerHTML = "Coloca aquí";
-            casDer.innerHTML = "Coloca aquí";
-            casIzq.style.backgroundColor = "#f5f5f5";
-            casDer.style.backgroundColor = "#f5f5f5";
+            const datos = niveles[numNivel];
+            juegoBloqueado = false;
 
-            document.getElementById("btn-validar").style.display = "inline-block";
-            document.getElementById("btn-reintentar").style.display = "none";
-            document.getElementById("btn-siguiente").style.display = "none";
+            document.getElementById("titulo-juego").innerText = datos.titulo;
+            document.getElementById("instrucciones-juego").innerText = datos.instrucciones;
+            document.getElementById("bloque-izq").innerText = datos.textoIzq;
+            document.getElementById("bloque-der").innerText = datos.textoDer;
+            document.getElementById("bloque-signo").innerText = "?";
             document.getElementById("mensaje").innerText = "";
 
-            const vitrina = document.getElementById("vitrina-productos");
-            vitrina.innerHTML = "";
+            document.getElementById("btn-reintentar").style.display = "none";
+            document.getElementById("btn-siguiente").style.display = "none";
+            
+            // Reestablecer estados y clases de todos los globos
+            const globos = document.querySelectorAll('.globo');
+            globos.forEach(g => {
+                g.classList.remove('reventado');
+            });
 
-            vitrina.appendChild(crearTarjetaHTML(niveles[nivelActual].p1));
-            vitrina.appendChild(crearTarjetaHTML(niveles[nivelActual].p2));
+            document.getElementById("zona-vuelo").style.pointerEvents = "auto";
+            document.getElementById("zona-vuelo").style.opacity = "1";
+
+            actualizarMarcadorVisual();
         }
 
-        function crearTarjetaHTML(prod) {
-            const div = document.createElement("div");
-            div.className = "tarjeta-producto";
-            div.id = prod.id;
-            div.draggable = true;
-            div.ondragstart = (e) => { productoSiendoArrastrado = prod; e.dataTransfer.setData("text/plain", prod.id); };
-            div.onclick = () => leerTexto(`${prod.nombre}, cuesta ${prod.precio} pesos`);
-            div.innerHTML = `<div class="icono">${prod.icono}</div><div class="nombre">${prod.nombre}</div><div class="precio">$${prod.precio}</div>`;
-            return div;
+        function intentarReviento(elementoGlobo, signo) {
+            if (juegoBloqueado) return;
+            juegoBloqueado = true;
+
+            // Bloquear entrada táctil inmediatamente
+            document.getElementById("zona-vuelo").style.pointerEvents = "none";
+
+            // Ejecutar efectos del reventado
+            reproducirSonidoPop();
+            elementoGlobo.classList.add('reventado');
+
+            // Esperar el final de la animación CSS de expansión (200ms) para procesar la lógica matemática
+            setTimeout(() => {
+                procesarRespuesta(signo);
+            }, 200);
         }
 
-        function permitirSoltar(ev) { ev.preventDefault(); }
+        function procesarRespuesta(signo) {
+            const datos = niveles[nivelActual];
+            document.getElementById("bloque-signo").innerText = signo;
 
-        function soltarProducto(ev, lado) {
-            ev.preventDefault();
-            if (!productoSiendoArrastrado) return;
-
-            if (lado === 'izq' && productoEnDerecha && productoEnDerecha.id === productoSiendoArrastrado.id) {
-                productoEnDerecha = null; document.getElementById("casilla-derecha").innerHTML = "Coloca aquí"; document.getElementById("casilla-derecha").style.backgroundColor = "#f5f5f5";
-            }
-            if (lado === 'der' && productoEnIzquierda && productoEnIzquierda.id === productoSiendoArrastrado.id) {
-                productoEnIzquierda = null; document.getElementById("casilla-izquierda").innerHTML = "Coloca aquí"; document.getElementById("casilla-izquierda").style.backgroundColor = "#f5f5f5";
-            }
-
-            const elemento = document.getElementById(productoSiendoArrastrado.id);
-            ev.currentTarget.innerHTML = "";
-            ev.currentTarget.appendChild(elemento);
-            ev.currentTarget.style.backgroundColor = "#e8f5e9";
-
-            if (lado === 'izq') productoEnIzquierda = productoSiendoArrastrado;
-            else productoEnDerecha = productoSiendoArrastrado;
-
-            leerTexto(`Pusiste ${productoSiendoArrastrado.nombre}`);
-            productoSiendoArrastrado = null;
-        }
-
-        function validarTienda() {
-            if (!productoEnIzquierda || !productoEnDerecha) {
-                leerTexto("Coloca un producto en cada casilla."); return;
-            }
-            const signo = niveles[nivelActual].signo;
-            let esCorrecto = (signo === ">" && productoEnIzquierda.precio > productoEnDerecha.precio) || (signo === "<" && productoEnIzquierda.precio < productoEnDerecha.precio);
-
-            if (esCorrecto) {
-                document.getElementById("mensaje").innerText = "¡Excelente! Orden correcto.";
+            if (signo === datos.correcto) {
+                confetti({ particleCount: 140, spread: 70, origin: { y: 0.6 } });
+                document.getElementById("mensaje").innerText = datos.exito;
                 document.getElementById("mensaje").style.color = "green";
-                document.getElementById("btn-validar").style.display = "none";
+                leerTextoSimple("¡Excelente respuesta! Avanza al siguiente nivel.");
+
+                puntosGanadosEsteJuego += 10;
+                let nuevoTotal = obtenerPuntajeGlobal() + 10;
+                localStorage.setItem("puntajeAcumulado", nuevoTotal);
+                actualizarMarcadorVisual();
+
                 document.getElementById("btn-siguiente").style.display = "inline-block";
-                leerTexto("¡Excelente! Presiona siguiente nivel.");
             } else {
-                document.getElementById("mensaje").innerText = "¡Oh, algo está mal!";
+                document.getElementById("mensaje").innerText = datos.fallo;
                 document.getElementById("mensaje").style.color = "red";
-                document.getElementById("btn-validar").style.display = "none";
+                document.getElementById("zona-vuelo").style.opacity = "0.5";
+                leerTextoSimple("Oh, ese globo no tenía la respuesta correcta. Inténtalo de nuevo.");
+
                 document.getElementById("btn-reintentar").style.display = "inline-block";
-                leerTexto("Inténtalo de nuevo.");
             }
         }
 
-        function reintentarNivel() { cargarNivel(); }
+        function reintentar() {
+            cargarNivel(nivelActual);
+        }
 
         function siguienteNivel() {
-            confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
-            setTimeout(() => {
-                puntajeJuegoActual += 10;
-                nivelActual++;
-                cargarNivel();
-            }, 600);
-        }
-
-        function terminarJuego() {
             window.speechSynthesis.cancel();
-            let acumulado = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
-            localStorage.setItem("puntajeAcumulado", acumulado + puntajeJuegoActual);
-            window.location.href = "4basico.html"; // Retorno coordinado
+            nivelActual++;
+            cargarNivel(nivelActual);
         }
 
-        function leerTexto(t) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'es-ES'; window.speechSynthesis.speak(u); }
-        function leerIndicaciones() { const s = niveles[nivelActual].signo === ">" ? "mayor que" : "menor que"; leerTexto(`El signo central es ${s}. Arrastra los elementos para cumplir la regla.`); }
+        function mostrarPantallaFinal() {
+            document.getElementById("contenedor-juego").style.display = "none";
+            document.getElementById("contenedor-final").style.display = "block";
+            document.getElementById("puntos-final").innerText = puntosGanadosEsteJuego;
+
+            const txtEval = document.getElementById("mensaje-final-evaluacion");
+            txtEval.innerText = "🏆 ¡Fabuloso! Tus puntos se sumaron correctamente.";
+            txtEval.style.color = "green";
+
+            leerTextoSimple("¡Felicitaciones! Completaste el desafío de los globos. Presiona el botón para salir.");
+        }
+
+        function leerSecuencia(secuencia, indice = 0) {
+            if (indice >= secuencia.length) return;
+
+            const paso = secuencia[indice];
+            const elementoHTML = document.getElementById(paso.resaltar);
+
+            const u = new SpeechSynthesisUtterance(paso.texto);
+            u.lang = 'es-ES';
+
+            u.onstart = () => {
+                if (elementoHTML) elementoHTML.classList.add("efecto-hablar");
+            };
+
+            u.onend = () => {
+                if (elementoHTML) elementoHTML.classList.remove("efecto-hablar");
+                leerSecuencia(secuencia, indice + 1);
+            };
+
+            window.speechSynthesis.speak(u);
+        }
+
+        function leerTextoSimple(t) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(t);
+            u.lang = 'es-ES';
+            window.speechSynthesis.speak(u);
+        }
+
+        function leerIndicaciones() {
+            window.speechSynthesis.cancel();
+            document.getElementById("bloque-izq").classList.remove("efecto-hablar");
+            document.getElementById("bloque-der").classList.remove("efecto-hablar");
+            document.getElementById("zona-vuelo").classList.remove("efecto-hablar");
+
+            if(document.getElementById("contenedor-juego").style.display !== "none") {
+                leerSecuencia(niveles[nivelActual].audioSecuencia);
+            } else {
+                leerTextoSimple("Fin de la partida. Regresa al menú usando el botón marrón.");
+            }
+        }
+
+        function irAMenu() {
+            window.speechSynthesis.cancel();
+            window.location.href = "4basico.html";
+        }
+
+        window.onload = () => {
+            cargarNivel(0);
+        };
     </script>
 </body>
 </html>

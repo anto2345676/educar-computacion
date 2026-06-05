@@ -6,158 +6,59 @@
     <title>Juego de Mayor y Menor</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body {
-            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
-            background-color: #f0f8ff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        /* Marcador de puntaje en la esquina superior derecha */
-        #marcador {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: #ffcc00;
-            padding: 10px 20px;
-            border-radius: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        /* Botón del parlante de indicaciones */
-        #btn-parlante {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 40px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            transition: transform 0.2s;
-        }
+        body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #f0f8ff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        
+        #marcador { position: absolute; top: 20px; right: 20px; background-color: #ffcc00; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333; }
+        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; transition: transform 0.2s; }
         #btn-parlante:hover { transform: scale(1.1); }
 
-        /* Contenedor del juego */
-        .pantalla-juego {
-            text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            min-width: 450px;
-        }
+        .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); min-width: 450px; max-width: 600px; width: 85%; }
+        .pantalla-final { display: none; }
+        
+        .zona-comparacion { display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 40px; }
+        .numero { font-size: 64px; font-weight: bold; color: #333; cursor: pointer; padding: 10px; transition: transform 0.3s ease; }
+        
+        .casilla-destino { width: 100px; height: 100px; border: 4px dashed #bbb; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 64px; font-weight: bold; background-color: #fafafa; transition: transform 0.3s ease, border-color 0.3s ease; }
 
-        /* Zona de la ecuación */
-        .zona-comparacion {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .numero {
-            font-size: 64px;
-            font-weight: bold;
-            color: #333;
-            cursor: pointer;
-            padding: 10px;
-        }
-
-        /* Casilla donde se suelta el signo */
-        .casilla-destino {
-            width: 100px;
-            height: 100px;
-            border: 4px dashed #bbb;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 64px;
-            font-weight: bold;
-            background-color: #fafafa;
-        }
-
-        /* Zona de los signos arrastrables */
-        .zona-signos {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .signo {
-            font-size: 64px;
-            font-weight: bold;
-            width: 90px;
-            height: 90px;
-            background-color: #4da6ff;
-            color: white;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: grab;
-            user-select: none;
-            box-shadow: 0 6px rgba(0, 74, 153, 1);
-        }
+        .zona-signos { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; background: #eef1f6; padding: 15px; border-radius: 15px; border: 2px dashed #b0bec5; transition: transform 0.3s ease; }
+        .signo { font-size: 64px; font-weight: bold; width: 90px; height: 90px; background-color: #4da6ff; color: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: grab; user-select: none; box-shadow: 0 6px rgba(0, 74, 153, 1); }
         .signo:active { cursor: grabbing; }
 
-        /* Botones de control */
-        .controles {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
+        /* Estilo de animación para la voz sincronizada */
+        @keyframes palpitar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(77, 166, 255, 0.5); }
+            100% { transform: scale(1); }
+        }
+        .efecto-hablar {
+            animation: palpitar 0.8s ease-in-out 2;
+            border-color: #4da6ff !important;
+            color: #4da6ff !important;
         }
 
-        button.btn-accion {
-            padding: 15px 30px;
-            font-size: 20px;
-            font-weight: bold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            color: white;
-            box-shadow: 0 4px rgba(0,0,0,0.2);
-        }
-        
+        .controles { display: flex; gap: 20px; justify-content: center; }
+        button.btn-accion { padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; box-shadow: 0 4px rgba(0,0,0,0.2); }
         #btn-siguiente { background-color: #ff9f1c; }
         #btn-validar-final { background-color: #2ec4b6; display: none; }
-        #btn-reiniciar-todo { background-color: #7209b7; display: none; }
+        .btn-menu { background-color: #795548; }
         
-        button.btn-accion:active {
-            transform: translateY(4px);
-            box-shadow: none;
-        }
-
-        /* Mensajes de feedback */
-        #mensaje {
-            margin-top: 20px;
-            font-size: 24px;
-            font-weight: bold;
-        }
+        button.btn-accion:active { transform: translateY(4px); box-shadow: none; }
+        #mensaje { margin-top: 20px; font-size: 24px; font-weight: bold; }
+        .resultado-puntos { font-size: 32px; color: #2e7d32; margin: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <button id="btn-parlante" onclick="leerIndicaciones()" title="Escuchar indicaciones">🔊</button>
+    <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <div id="marcador">Puntos: <span id="puntos">0</span></div>
-
-    <div class="pantalla-juego">
+    <div class="pantalla-juego" id="contenedor-juego">
         <h2 id="titulo-pantalla" style="color: #4da6ff; margin-top: 0;">¡A jugar!</h2>
 
         <div class="zona-comparacion" id="area-comparacion">
-            <div class="numero" id="num1" onclick="leerTexto(this.innerText)">0</div>
+            <div class="numero" id="num1" onclick="leerTextoSimple(this.innerText)">0</div>
             <div class="casilla-destino" id="destino" ondragover="permitirSoltar(event)" ondrop="soltarSigno(event)">?</div>
-            <div class="numero" id="num2" onclick="leerTexto(this.innerText)">0</div>
+            <div class="numero" id="num2" onclick="leerTextoSimple(this.innerText)">0</div>
         </div>
 
         <div class="zona-signos" id="contenedor-signos">
@@ -168,143 +69,177 @@
         <div class="controles">
             <button class="btn-accion" id="btn-siguiente" onclick="registrarYAvanzar()">Siguiente Nivel</button>
             <button class="btn-accion" id="btn-validar-final" onclick="validarTodoElJuego()">Validar Juego</button>
-            <button class="btn-accion" id="btn-reiniciar-todo" onclick="reiniciarJuegoCompleto()">Volver a jugar</button>
         </div>
 
         <div id="mensaje"></div>
     </div>
 
+    <div class="pantalla-final" id="contenedor-final">
+        <h2 id="titulo-final">Desafío Terminado</h2>
+        <p style="font-size: 20px;">Has evaluado todas las expresiones numéricas.</p>
+        <div class="resultado-puntos">Sumaste +<span id="puntos-final">0</span> puntos a tu menú</div>
+        <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
+        
+        <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
+            <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
+        </div>
+    </div>
+
     <script>
-        // Niveles solicitados
         const niveles = [
-            { n1: 100, n2: 60, correcto: ">" },
-            { n1: 500, n2: 1000, correcto: "<" },
-            { n1: 8000, n2: 5964, correcto: ">" },
-            { n1: 5384, n2: 9769, correcto: "<" }
+            { 
+                n1: 100, n2: 60, correcto: ">",
+                audioSecuencia: [
+                    { texto: "A la izquierda tenemos el número 100.", resaltar: "num1" },
+                    { texto: "A la derecha tenemos el número 60.", resaltar: "num2" },
+                    { texto: "Arrastra el signo correcto de la zona inferior al recuadro del centro.", resaltar: "contenedor-signos" }
+                ]
+            },
+            { 
+                n1: 500, n2: 1000, correcto: "<",
+                audioSecuencia: [
+                    { texto: "Compara quinientos...", resaltar: "num1" },
+                    { texto: "...con el número mil.", resaltar: "num2" },
+                    { texto: "Coloca el signo correspondiente en la casilla.", resaltar: "destino" }
+                ]
+            },
+            { 
+                n1: 8000, n2: 5964, correcto: ">",
+                audioSecuencia: [
+                    { texto: "Tenemos ocho mil en el sector izquierdo.", resaltar: "num1" },
+                    { texto: "Y cinco mil novecientos sesenta y cuatro a la derecha.", resaltar: "num2" },
+                    { texto: "Elige qué operador los compara de manera correcta.", resaltar: "contenedor-signos" }
+                ]
+            },
+            { 
+                n1: 5384, n2: 9769, correcto: "<",
+                audioSecuencia: [
+                    { texto: "Por último, cinco mil trescientos ochenta y cuatro.", resaltar: "num1" },
+                    { texto: "Frente a nueve mil setecientos sesenta y nueve.", resaltar: "num2" },
+                    { texto: "Arrastra el signo final.", resaltar: "destino" }
+                ]
+            }
         ];
 
         let nivelActual = 0;
-        let puntaje = 0;
+        let puntosGanadosEsteJuego = 0;
         let signoSeleccionado = "";
-        
-        // Aquí guardaremos las respuestas que el alumno va colocando en cada nivel
         let respuestasUsuario = [];
 
-        // Inicializar el juego
-        cargarNivel();
+        function obtenerPuntajeGlobal() {
+            return parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+        }
+
+        function actualizarMarcadorVisual() {
+            document.getElementById("puntos").innerText = obtenerPuntajeGlobal();
+        }
 
         function cargarNivel() {
-            // Re-mostrar la interfaz de juego por si venimos de un reinicio
-            document.getElementById("area-comparacion").style.display = "flex";
-            document.getElementById("contenedor-signos").style.display = "flex";
             document.getElementById("titulo-pantalla").innerText = `Nivel ${nivelActual + 1} de ${niveles.length}`;
-
-            // Configurar números en la pantalla
             document.getElementById("num1").innerText = niveles[nivelActual].n1;
             document.getElementById("num2").innerText = niveles[nivelActual].n2;
             
-            // Limpiar casilla de destino
             const destino = document.getElementById("destino");
             destino.innerText = "?";
             destino.style.backgroundColor = "#fafafa";
             signoSeleccionado = "";
 
-            // Control de botones: Sólo avanza nivel por nivel
             document.getElementById("btn-siguiente").style.display = "inline-block";
             document.getElementById("btn-validar-final").style.display = "none";
-            document.getElementById("btn-reiniciar-todo").style.display = "none";
             document.getElementById("mensaje").innerText = "";
+
+            actualizarMarcadorVisual();
         }
 
         function registrarYAvanzar() {
             if (signoSeleccionado === "") {
-                leerTexto("Por favor, debes arrastrar un signo antes de continuar.");
-                alert("¡Arrastra un signo primero!");
+                leerTextoSimple("Por favor, debes arrastrar un signo antes de continuar.");
                 return;
             }
 
-            // Guardamos la respuesta del nivel actual
             respuestasUsuario[nivelActual] = signoSeleccionado;
-
-            // Pasamos al siguiente nivel en la memoria
             nivelActual++;
 
             if (nivelActual < niveles.length) {
-                // Si quedan niveles, cargamos el siguiente de inmediato sin validar aún
                 cargarNivel();
             } else {
-                // ¡Llegó al final de los niveles! Ahora toca validar todo
                 pantallaDeValidacionFinal();
             }
         }
 
         function pantallaDeValidacionFinal() {
-            document.getElementById("titulo-pantalla").innerText = "¡Has completado los ejercicios!";
+            document.getElementById("titulo-pantalla").innerText = "¡Ejercicios Completados!";
             document.getElementById("mensaje").innerText = "Presiona el botón para revisar tus resultados.";
             document.getElementById("mensaje").style.color = "#333";
             
-            // Ocultamos los números y signos para concentrarnos en el cierre
             document.getElementById("area-comparacion").style.display = "none";
             document.getElementById("contenedor-signos").style.display = "none";
 
-            // Cambiamos el botón de Siguiente por el de Validar Juego
             document.getElementById("btn-siguiente").style.display = "none";
             document.getElementById("btn-validar-final").style.display = "inline-block";
             
-            leerTexto("Has terminado de responder. Presiona el botón validar juego para saber tu puntaje.");
+            leerTextoSimple("Has terminado de responder. Presiona el botón validar juego para descubrir tu puntaje.");
         }
 
         function validarTodoElJuego() {
             let aciertos = 0;
 
-            // Comparamos cada respuesta guardada con la solución correcta
             for (let i = 0; i < niveles.length; i++) {
                 if (respuestasUsuario[i] === niveles[i].correcto) {
                     aciertos++;
                 }
             }
 
-            // Cada acierto vale 10 puntos
-            puntaje = aciertos * 10;
-            document.getElementById("puntos").innerText = puntaje;
+            puntosGanadosEsteJuego = aciertos * 10;
+            
+            // Sumar de forma acumulativa y guardar en la memoria persistente del navegador
+            let nuevoTotal = obtenerPuntajeGlobal() + puntosGanadosEsteJuego;
+            localStorage.setItem("puntajeAcumulado", nuevoTotal);
 
-            const mensajeDiv = document.getElementById("mensaje");
-            document.getElementById("btn-validar-final").style.display = "none";
-            document.getElementById("btn-reiniciar-todo").style.display = "inline-block";
+            // Mostrar Pantalla Final Estructurada
+            document.getElementById("contenedor-juego").style.display = "none";
+            document.getElementById("contenedor-final").style.display = "block";
+            document.getElementById("puntos-final").innerText = puntosGanadosEsteJuego;
 
-            // Si todas están buenas (4 niveles = 40 puntos)
+            const tituloFinal = document.getElementById("titulo-final");
+            const mensajeEval = document.getElementById("mensaje-final-evaluacion");
+
             if (aciertos === niveles.length) {
-                document.getElementById("titulo-pantalla").innerText = "¡Juego Perfecto! 🎉";
-                mensajeDiv.innerText = `¡Excelente! Todas están buenas. Tu puntaje final es: ${puntaje} puntos.`;
-                mensajeDiv.style.color = "green";
-                leerTexto(`¡Excelente! Todas están buenas. Tu puntaje final es de ${puntaje} puntos. ¡Felicitaciones!`);
-                
-                // Explosión de confeti al estar todo correcto
-                confetti({
-                    particleCount: 180,
-                    spread: 100,
-                    origin: { y: 0.6 }
-                });
+                confetti({ particleCount: 180, spread: 100, origin: { y: 0.6 } });
+                tituloFinal.innerText = "¡Juego Perfecto! 🎉";
+                mensajeEval.innerText = "¡Excelente! Todas tus respuestas son correctas.";
+                mensajeEval.style.color = "green";
+                leerTextoSimple(`¡Excelente! Todas están buenas. Sumaste ${puntosGanadosEsteJuego} puntos a tu menú. ¡Felicitaciones!`);
             } else {
-                // Si tuvo algún error
-                document.getElementById("titulo-pantalla").innerText = "¡Puedes hacerlo mejor! 👍";
-                mensajeDiv.innerText = `Lograste ${aciertos} de ${niveles.length} correctas. Tu puntaje final es: ${puntaje} puntos.`;
-                mensajeDiv.style.color = "red";
-                leerTexto(`Tu puntaje final es de ${puntaje} puntos. Tuviste algunos errores. ¡Presiona volver a jugar para mejorar!`);
+                tituloFinal.innerText = "¡Buen intento! 👍";
+                mensajeEval.innerText = `Lograste ${aciertos} de ${niveles.length} respuestas correctas.`;
+                mensajeEval.style.color = "#e65100";
+                leerTextoSimple(`Terminaste el juego. Lograste sumarle ${puntosGanadosEsteJuego} puntos a tu menú. ¡Sigue practicando!`);
             }
         }
 
-        function reiniciarJuegoCompleto() {
-            nivelActual = 0;
-            puntaje = 0;
-            respuestasUsuario = [];
-            document.getElementById("puntos").innerText = puntaje;
-            cargarNivel();
-            leerTexto("¡Empecemos de nuevo! Pon mucha atención.");
+        function leerSecuencia(secuencia, indice = 0) {
+            if (indice >= secuencia.length) return;
+
+            const paso = secuencia[indice];
+            const elementoHTML = document.getElementById(paso.resaltar);
+
+            const u = new SpeechSynthesisUtterance(paso.texto);
+            u.lang = 'es-ES';
+
+            u.onstart = () => {
+                if (elementoHTML) elementoHTML.classList.add("efecto-hablar");
+            };
+
+            u.onend = () => {
+                if (elementoHTML) elementoHTML.classList.remove("efecto-hablar");
+                leerSecuencia(secuencia, indice + 1);
+            };
+
+            window.speechSynthesis.speak(u);
         }
 
-        // --- FUNCIONES DE VOZ (Web Speech API) ---
-        function leerTexto(texto) {
+        function leerTextoSimple(texto) {
             window.speechSynthesis.cancel();
             const lectura = new SpeechSynthesisUtterance(texto);
             lectura.lang = 'es-ES';
@@ -312,35 +247,48 @@
         }
 
         function leerIndicaciones() {
-            if (nivelActual >= niveles.length) {
-                leerTexto("El juego ha terminado. Presiona el botón morado si deseas reiniciar todo el tablero.");
+            window.speechSynthesis.cancel();
+            document.getElementById("num1").classList.remove("efecto-hablar");
+            document.getElementById("num2").classList.remove("efecto-hablar");
+            document.getElementById("destino").classList.remove("efecto-hablar");
+            document.getElementById("contenedor-signos").classList.remove("efecto-hablar");
+
+            if (nivelActual < niveles.length) {
+                leerSecuencia(niveles[nivelActual].audioSecuencia);
             } else {
-                leerTexto("Arrastra el signo correcto al cuadro del centro. Cuando estés listo, presiona siguiente nivel. Evaluaremos todas tus respuestas al final.");
+                leerTextoSimple("El juego ha terminado. Presiona el botón para volver al menú de inicio.");
             }
         }
 
         function leerSigno(tipo) {
-            if (tipo === 'mayor') leerTexto("Signo Mayor que");
-            if (tipo === 'menor') leerTexto("Signo Menor que");
+            if (tipo === 'mayor') leerTextoSimple("Signo Mayor que");
+            if (tipo === 'menor') leerTextoSimple("Signo Menor que");
         }
 
-        // --- FUNCIONES ARRASTRAR Y SOLTAR ---
         function arrastrar(ev) {
             ev.dataTransfer.setData("text", ev.target.innerText);
             leerSigno(ev.target.id);
         }
 
-        function permitirSoltar(ev) {
-            ev.preventDefault();
-        }
+        function permitirSoltar(ev) { ev.preventDefault(); }
 
         function soltarSigno(ev) {
             ev.preventDefault();
             const data = ev.dataTransfer.getData("text");
             ev.target.innerText = data;
+            ev.target.style.backgroundColor = "#e8f5e9";
             signoSeleccionado = data;
-            leerTexto(data === ">" ? "Colocaste Mayor que" : "Colocaste Menor que");
+            leerTextoSimple(data === ">" ? "Colocaste Mayor que" : "Colocaste Menor que");
         }
+
+        function irAMenu() {
+            window.speechSynthesis.cancel();
+            window.location.href = "4basico.html"; 
+        }
+
+        window.onload = () => {
+            cargarNivel();
+        };
     </script>
 </body>
 </html>

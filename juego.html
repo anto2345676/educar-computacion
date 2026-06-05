@@ -3,26 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego 1: La Cafetería</title>
+    <title>Juego Matemático: Mayor, Menor o Igual</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #ffe0b2; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         #marcador { position: absolute; top: 20px; right: 20px; background-color: #ff9800; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; }
         #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; }
-        .pantalla-juego { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 85%; max-width: 700px; }
+        .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 85%; max-width: 700px; }
+        .pantalla-final { display: none; }
         h2 { color: #e65100; margin-top: 0; }
-        .fuente-donas { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; background: #fff3e0; padding: 15px; border-radius: 15px; border: 2px dashed #ffb74d; min-height: 80px; }
-        .dona { font-size: 45px; cursor: grab; user-select: none; }
+        
+        /* Contenedores con transición suave para las animaciones */
+        .fuente-elementos { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; background: #fff3e0; padding: 15px; border-radius: 15px; border: 2px dashed #ffb74d; min-height: 80px; transition: transform 0.3s ease, border-color 0.3s ease; }
+        .caja-destino { width: 180px; height: 180px; border: 4px dashed #b2dfdb; border-radius: 15px; background-color: #e0f2f1; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 5px; padding: 10px; justify-content: center; overflow: hidden; transition: transform 0.3s ease, border-color 0.3s ease; }
+        .plato-fijo { width: 180px; height: 180px; border: 4px solid #ffb74d; border-radius: 15px; background-color: #fff8e1; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 5px; padding: 10px; justify-content: center; transition: transform 0.3s ease, border-color 0.3s ease; }
+        
+        /* Animación para cuando el elemento resalta al hablar */
+        @keyframes palpitar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(230, 81, 0, 0.4); }
+            100% { transform: scale(1); }
+        }
+        .efecto-hablar {
+            animation: palpitar 0.8s ease-in-out 2;
+            border-color: #e65100 !important;
+        }
+
+        .elemento { font-size: 45px; cursor: grab; user-select: none; }
         .zona-comparacion { display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 30px; }
-        .caja-destino { width: 180px; height: 180px; border: 4px dashed #b2dfdb; border-radius: 15px; background-color: #e0f2f1; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 5px; padding: 10px; justify-content: center; overflow: hidden; }
-        .plato-fijo { width: 180px; height: 180px; border: 4px solid #ffb74d; border-radius: 15px; background-color: #fff8e1; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 5px; padding: 10px; justify-content: center; }
         .signo { font-size: 70px; font-weight: bold; color: #e65100; }
         .controles { display: flex; gap: 20px; justify-content: center; }
         button.btn-accion { padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; }
         #btn-validar { background-color: #4caf50; }
         #btn-reintentar { background-color: #f44336; display: none; }
         #btn-siguiente { background-color: #2196f3; display: none; }
+        .btn-menu { background-color: #795548; }
+        .btn-reiniciar { background-color: #ff9800; }
         #mensaje { margin-top: 20px; font-size: 24px; font-weight: bold; }
+        .resultado-puntos { font-size: 32px; color: #e65100; margin: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -30,42 +48,138 @@
     <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
     <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <div class="pantalla-juego">
-        <h2>Juego 1: ¡El Reto de las Donas! 🍩</h2>
-        <p style="font-weight: bold; color: #555;">En el plato amarillo hay 2 donas. Arrastra desde la bandeja de arriba las donas necesarias a la caja verde para que la cantidad sea **MAYOR** que 2.</p>
+    <div class="pantalla-juego" id="contenedor-juego">
+        <h2 id="titulo-juego">Juego 1: ¡El Reto de las Donas! 🍩</h2>
+        <p id="instrucciones-juego" style="font-weight: bold; color: #555;"></p>
         
-        <div class="fuente-donas" id="bandeja" ondragover="permitirSoltar(event)" ondrop="soltarDeVuelta(event)">
-            <div class="dona" id="d1" draggable="true" ondragstart="start(event)">🍩</div>
-            <div class="dona" id="d2" draggable="true" ondragstart="start(event)">🍩</div>
-            <div class="dona" id="d3" draggable="true" ondragstart="start(event)">🍩</div>
-            <div class="dona" id="d4" draggable="true" ondragstart="start(event)">🍩</div>
-            <div class="dona" id="d5" draggable="true" ondragstart="start(event)">🍩</div>
-        </div>
+        <div class="fuente-elementos" id="bandeja" ondragover="permitirSoltar(event)" ondrop="soltarDeVuelta(event)"></div>
 
         <div class="zona-comparacion">
             <div class="caja-destino" id="caja-izquierda" ondragover="permitirSoltar(event)" ondrop="soltarEnCaja(event)"></div>
             
-            <div class="signo">&gt;</div>
+            <div class="signo" id="simbolo-comparacion">&gt;</div>
             
-            <div class="plato-fijo">
-                <div class="dona">🍩</div>
-                <div class="dona">🍩</div>
-            </div>
+            <div class="plato-fijo" id="plato-derecho"></div>
         </div>
 
         <div class="controles">
             <button class="btn-accion" id="btn-validar" onclick="validarJuego()">Verificar</button>
             <button class="btn-accion" id="btn-reintentar" onclick="reintentar()">Volver a intentar</button>
-            <button class="btn-accion" id="btn-siguiente" onclick="siguiente()">Siguiente Juego</button>
+            <button class="btn-accion" id="btn-siguiente" onclick="siguienteNivel()">Siguiente Juego</button>
         </div>
         <div id="mensaje"></div>
     </div>
 
+    <div class="pantalla-final" id="contenedor-final">
+        <h2>🎉 ¡Fin del Juego! 🎉</h2>
+        <p style="font-size: 20px;">Has terminado todos los desafíos.</p>
+        <div class="resultado-puntos">Tu puntaje total: <span id="puntos-final">0</span> / 30 puntos</div>
+        <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
+        
+        <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
+            <button class="btn-accion btn-reiniciar" id="btn-volver-jugar" onclick="reiniciarJuego()">🔄 Volver a jugar</button>
+            <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver a 4° Básico</button>
+        </div>
+    </div>
+
     <script>
-        // CAMBIO AQUÍ: Como borraste la pantalla anterior, obligamos a que el juego arranque en 0 puntos siempre.
+        const niveles = [
+            {
+                titulo: "Juego 1: ¡El Reto de las Donas! 🍩",
+                instrucciones: "En el plato amarillo hay 2 donas. Arrastra desde la bandeja las donas necesarias a la caja verde para que la cantidad sea MAYOR que 2.",
+                audioSecuencia: [
+                    { texto: "En el plato amarillo hay dos donas.", resaltar: "plato-derecho" },
+                    { texto: "Arrastra elementos desde la bandeja de arriba...", resaltar: "bandeja" },
+                    { texto: "...hacia la caja verde para que la cantidad sea mayor que dos.", resaltar: "caja-izquierda" }
+                ],
+                emoji: "🍩",
+                cantidadBandeja: 5,
+                cantidadFijo: 2,
+                signo: ">",
+                validar: (cant) => cant > 2,
+                textoExito: "¡Excelente! Es mayor que 2.",
+                textoFallo: "Recuerda que la caja verde debe tener más donas que el plato amarillo."
+            },
+            {
+                titulo: "Juego 2: ¡El Festín de los Pasteles! 🍰",
+                instrucciones: "En el plato amarillo hay 4 pasteles. Arrastra desde la bandeja los pasteles necesarios a la caja verde para que la cantidad sea MENOR que 4.",
+                audioSecuencia: [
+                    { texto: "En el plato amarillo hay cuatro pasteles.", resaltar: "plato-derecho" },
+                    { texto: "Arrastra elementos desde la bandeja de arriba...", resaltar: "bandeja" },
+                    { texto: "...hacia la caja verde para que la cantidad sea menor que cuatro.", resaltar: "caja-izquierda" }
+                ],
+                emoji: "🍰",
+                cantidadBandeja: 5,
+                cantidadFijo: 4,
+                signo: "<",
+                validar: (cant) => cant < 4 && cant > 0,
+                textoExito: "¡Genial! Es menor que 4.",
+                textoFallo: "Recuerda que la caja verde debe tener menos pasteles que el plato amarillo (y al menos uno)."
+            },
+            {
+                titulo: "Juego 3: ¡Equilibrio de Helados! 🍦",
+                instrucciones: "En el plato amarillo hay 3 helados. Arrastra desde la bandeja los helados necesarios a la caja verde para que la cantidad sea IGUAL a 3.",
+                audioSecuencia: [
+                    { texto: "En el plato amarillo hay tres helados.", resaltar: "plato-derecho" },
+                    { texto: "Arrastra elementos desde la bandeja de arriba...", resaltar: "bandeja" },
+                    { texto: "...hacia la caja verde para que la cantidad sea exactamente igual a tres.", resaltar: "caja-izquierda" }
+                ],
+                emoji: "🍦",
+                cantidadBandeja: 5,
+                cantidadFijo: 3,
+                signo: "=",
+                validar: (cant) => cant === 3,
+                textoExito: "¡Perfecto! Ambas cantidades son iguales.",
+                textoFallo: "Recuerda que la caja verde debe tener exactamente la misma cantidad de helados que el plato amarillo."
+            }
+        ];
+
+        let nivelActual = 0;
         let puntaje = 0;
-        localStorage.setItem("puntajeAcumulado", puntaje);
-        document.getElementById("puntos").innerText = puntaje;
+        const PUNTAJE_MAXIMO = niveles.length * 10;
+
+        function cargarNivel(numNivel) {
+            if (numNivel >= niveles.length) {
+                mostrarPantallaFinal();
+                return;
+            }
+
+            const datosNivel = niveles[numNivel];
+            
+            document.getElementById("titulo-juego").innerText = datosNivel.titulo;
+            document.getElementById("instrucciones-juego").innerText = datosNivel.instrucciones;
+            document.getElementById("simbolo-comparacion").innerText = datosNivel.signo;
+            document.getElementById("mensaje").innerText = "";
+            
+            document.getElementById("btn-validar").style.display = "inline-block";
+            document.getElementById("btn-reintentar").style.display = "none";
+            document.getElementById("btn-siguiente").style.display = "none";
+
+            const bandeja = document.getElementById("bandeja");
+            const platoDerecho = document.getElementById("plato-derecho");
+            const cajaIzquierda = document.getElementById("caja-izquierda");
+            
+            bandeja.innerHTML = "";
+            platoDerecho.innerHTML = "";
+            cajaIzquierda.innerHTML = "";
+
+            for (let i = 1; i <= datosNivel.cantidadBandeja; i++) {
+                const item = document.createElement("div");
+                item.className = "elemento";
+                item.id = `elem-${i}`;
+                item.draggable = true;
+                item.innerText = datosNivel.emoji;
+                item.addEventListener("dragstart", start);
+                bandeja.appendChild(item);
+            }
+
+            for (let i = 0; i < datosNivel.cantidadFijo; i++) {
+                const item = document.createElement("div");
+                item.className = "elemento";
+                item.innerText = datosNivel.emoji;
+                platoDerecho.appendChild(item);
+            }
+        }
 
         function start(ev) { ev.dataTransfer.setData("text", ev.target.id); }
         function permitirSoltar(ev) { ev.preventDefault(); }
@@ -73,26 +187,32 @@
         function soltarEnCaja(ev) {
             ev.preventDefault();
             var data = ev.dataTransfer.getData("text");
-            document.getElementById("caja-izquierda").appendChild(document.getElementById(data));
-            leerTexto("Pusiste una dona en la caja");
+            const elementoArrastrado = document.getElementById(data);
+            if(elementoArrastrado) {
+                document.getElementById("caja-izquierda").appendChild(elementoArrastrado);
+                leerTextoSimple("Pusiste un elemento en la caja");
+            }
         }
 
         function soltarDeVuelta(ev) {
             ev.preventDefault();
             var data = ev.dataTransfer.getData("text");
-            document.getElementById("bandeja").appendChild(document.getElementById(data));
+            const elementoArrastrado = document.getElementById(data);
+            if(elementoArrastrado) {
+                document.getElementById("bandeja").appendChild(elementoArrastrado);
+            }
         }
 
         function validarJuego() {
-            const donasEnCaja = document.getElementById("caja-izquierda").children.length;
+            const datosNivel = niveles[nivelActual];
+            const cantidadEnCaja = document.getElementById("caja-izquierda").children.length;
             
-            if (donasEnCaja > 2) {
+            if (datosNivel.validar(cantidadEnCaja)) {
                 confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                document.getElementById("mensaje").innerText = "¡Excelente! Pusiste " + donasEnCaja + " donas. ¡Es mayor que 2!";
+                document.getElementById("mensaje").innerText = `¡Excelente! Pusiste ${cantidadEnCaja}. ${datosNivel.textoExito}`;
                 document.getElementById("mensaje").style.color = "green";
-                leerTexto("¡Muy bien hecho! Es correcto. Presiona el botón para ir al siguiente juego.");
+                leerTextoSimple(`¡Muy bien hecho! Es correcto. Presiona el botón para continuar.`);
                 
-                // MEJORA AQUÍ: Sumamos y mostramos los puntos inmediatamente en pantalla como recompensa visual
                 puntaje += 10;
                 localStorage.setItem("puntajeAcumulado", puntaje);
                 document.getElementById("puntos").innerText = puntaje;
@@ -102,7 +222,13 @@
             } else {
                 document.getElementById("mensaje").innerText = "¡Uh oh! Inténtalo de nuevo.";
                 document.getElementById("mensaje").style.color = "red";
-                leerTexto("Eso no está correcto. Recuerda que la caja verde debe tener más donas que el plato amarillo. Vuelve a intentarlo.");
+                
+                const caja = document.getElementById("caja-izquierda");
+                caja.style.transform = "scale(0.95)";
+                setTimeout(() => caja.style.transform = "scale(1)", 200);
+
+                leerTextoSimple(`Eso no está correcto. ${datosNivel.textoFallo} Vuelve a intentarlo.`);
+                
                 document.getElementById("btn-validar").style.display = "none";
                 document.getElementById("btn-reintentar").style.display = "inline-block";
             }
@@ -119,14 +245,97 @@
             document.getElementById("mensaje").innerText = "";
         }
 
-        function siguiente() {
+        function siguienteNivel() {
             window.speechSynthesis.cancel();
-            // Ya no sumamos los puntos aquí porque los sumamos arriba al ganar
-            window.location.href = "juego2.html";
+            nivelActual++;
+            cargarNivel(nivelActual);
         }
 
-        function leerTexto(t) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang='es-ES'; window.speechSynthesis.speak(u); }
-        function leerIndicaciones() { leerTexto("Arrastra las donas a la caja verde para que tengas una cantidad mayor que las dos donas del plato amarillo."); }
+        function mostrarPantallaFinal() {
+            document.getElementById("contenedor-juego").style.display = "none";
+            document.getElementById("contenedor-final").style.display = "block";
+            document.getElementById("puntos-final").innerText = puntaje;
+
+            const btnVolverJugar = document.getElementById("btn-volver-jugar");
+            const txtEvaluacion = document.getElementById("mensaje-final-evaluacion");
+
+            if (puntaje === PUNTAJE_MAXIMO) {
+                txtEvaluacion.innerText = "🏆 ¡Perfecto! Conseguiste todos los puntos disponibles.";
+                txtEvaluacion.style.color = "green";
+                btnVolverJugar.style.display = "none";
+                leerTextoSimple("¡Felicitaciones! Completaste el juego con puntaje perfecto.");
+            } else {
+                txtEvaluacion.innerText = "¡Buen intento! Te faltaron algunos puntos.";
+                txtEvaluacion.style.color = "#ff9800";
+                btnVolverJugar.style.display = "inline-block";
+                leerTextoSimple("Buen intento. Puedes volver a jugar para conseguir todos los puntos.");
+            }
+        }
+
+        function reiniciarJuego() {
+            nivelActual = 0;
+            puntaje = 0;
+            localStorage.setItem("puntajeAcumulado", puntaje);
+            document.getElementById("puntos").innerText = puntaje;
+            document.getElementById("contenedor-juego").style.display = "block";
+            document.getElementById("contenedor-final").style.display = "none";
+            cargarNivel(nivelActual);
+        }
+
+        function leerSecuencia(secuencia, indice = 0) {
+            if (indice >= secuencia.length) return;
+
+            const paso = secuencia[indice];
+            const elementoHTML = document.getElementById(paso.resaltar);
+
+            const u = new SpeechSynthesisUtterance(paso.texto);
+            u.lang = 'es-ES';
+
+            u.onstart = () => {
+                if (elementoHTML) {
+                    elementoHTML.classList.add("efecto-hablar");
+                }
+            };
+
+            u.onend = () => {
+                if (elementoHTML) {
+                    elementoHTML.classList.remove("efecto-hablar");
+                }
+                leerSecuencia(secuencia, indice + 1);
+            };
+
+            window.speechSynthesis.speak(u);
+        }
+
+        function leerTextoSimple(t) { 
+            window.speechSynthesis.cancel(); 
+            const u = new SpeechSynthesisUtterance(t); 
+            u.lang = 'es-ES'; 
+            window.speechSynthesis.speak(u); 
+        }
+
+        function leerIndicaciones() { 
+            window.speechSynthesis.cancel();
+            // Limpieza preventiva de animaciones activas
+            document.getElementById("bandeja").classList.remove("efecto-hablar");
+            document.getElementById("plato-derecho").classList.remove("efecto-hablar");
+            document.getElementById("caja-izquierda").classList.remove("efecto-hablar");
+
+            if(document.getElementById("contenedor-juego").style.display !== "none") {
+                leerSecuencia(niveles[nivelActual].audioSecuencia); 
+            } else {
+                leerTextoSimple("Fin del juego. Elige una opción para continuar.");
+            }
+        }
+
+        function irAMenu() {
+            window.speechSynthesis.cancel();
+            window.location.href = "4basico.html"; 
+        }
+
+        window.onload = () => {
+            reiniciarJuego();
+        };
     </script>
 </body>
 </html>

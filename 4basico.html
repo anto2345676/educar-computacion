@@ -3,112 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de 4° Básico - Matemáticas</title>
+    <title>Aula Virtual: Panel de Desafíos Matemáticos</title>
     <style>
         body {
             font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
-            background: linear-gradient(to bottom, #e3f2fd, #ffffff);
-            color: #333;
+            background: linear-gradient(to bottom, #7de3ff, #ffffff);
             margin: 0;
             padding: 20px;
-            text-align: center;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .contenedor-panel {
-            background: white;
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 30px;
-            border-radius: 25px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            border: 3px solid #90caf9;
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #004d99;
         }
 
-        h1 { color: #1565c0; margin-bottom: 5px; }
-        p { font-size: 18px; color: #555; }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
+        /* Marcador Global Superior */
         .marcador-global {
             background-color: #fff9c4;
-            border: 2px dashed #fbc02d;
-            border-radius: 15px;
-            padding: 20px;
+            color: #f57f17;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            border: 3px solid #fbc02d;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
             display: inline-flex;
             align-items: center;
-            gap: 15px;
-            font-size: 32px;
-            font-weight: bold;
-            color: #f57f17;
-            margin: 20px 0;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .bloque-acciones {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 25px;
-        }
-
-        .btn {
-            padding: 15px 30px;
+        .rango-medalla {
             font-size: 18px;
-            font-weight: bold;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            color: white;
-            box-shadow: 0 4px rgba(0,0,0,0.15);
-            transition: transform 0.1s;
+            color: #004d99;
+            font-style: italic;
+            margin-top: 5px;
         }
-        .btn:active { transform: translateY(3px); box-shadow: none; }
 
-        .btn-ir { background-color: #4caf50; }
-        .btn-reiniciar { background-color: #e53935; }
+        /* Contenedor de la Lista de Juegos */
+        .contenedor-juegos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1000px;
+            padding: 10px;
+        }
+
+        /* Tarjeta de cada Juego */
+        .tarjeta-juego {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border: 3px solid #b2dfdb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .tarjeta-juego:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            border-color: #00bfff;
+        }
+
+        .icono-juego {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .titulo-juego {
+            font-size: 20px;
+            color: #004d99;
+            margin: 0 0 10px 0;
+        }
+
+        .descripcion-juego {
+            font-size: 14px;
+            color: #666;
+            margin: 0 0 20px 0;
+            flex-grow: 1;
+        }
+
+        /* Botón de Jugar */
+        .btn-jugar {
+            background-color: #00bfff;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px #0099cc;
+            transition: background-color 0.2s, transform 0.1s;
+            width: 80%;
+        }
+
+        .btn-jugar:hover {
+            background-color: #0099cc;
+        }
+
+        .btn-jugar:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        /* Botón reiniciar progreso */
+        .btn-reiniciar {
+            margin-top: 40px;
+            background-color: #ff66b3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px #e60073;
+        }
+        .btn-reiniciar:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
 
-    <div class="contenedor-panel">
-        <h1>🏫 Aula Virtual: 4° Año Básico</h1>
-        <p>Progreso global de desafíos de comparación matemática</p>
+    <header>
+        <h1>🎒 Mi Aula Virtual de Matemáticas 📐</h1>
+        <p style="font-size: 18px; color: #555; font-weight: bold;">¡Completa las misiones y junta todas las estrellas posibles!</p>
+    </header>
 
+    <div style="text-align: center;">
         <div class="marcador-global">
-            ⭐ <span id="total-puntos">0</span> Puntos Totales
+            ⭐ <span id="puntaje-total">0</span> Puntos Totales
         </div>
-
-        <div class="bloque-acciones">
-            <button class="btn btn-ir" onclick="irALaTienda()">🛒 Entrar a la Tienda</button>
-            <button class="btn btn-reiniciar" onclick="reiniciarTodo()">🔄 Limpiar Puntaje</button>
-        </div>
+        <div class="rango-medalla" id="rango-texto">Rango: Aprendiz de la Isla 🥚</div>
     </div>
 
+    <div class="contenedor-juegos">
+
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🍩</div>
+            <h3 class="titulo-juego">Juego 1: La cafeteria</h3>
+            <p class="descripcion-juego">Desifra la cantidad de postres y resuelve los ejercisios</p>
+            <a href="juego.html" class="btn-jugar">¡Jugar Ahora!</a>
+        </div>
+
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🛒</div>
+            <h3 class="titulo-juego">Juego 2: Tienda</h3>
+            <p class="descripcion-juego">Ayuda al mago a ordenar sus pociones numéricas utilizando las reglas lógicas del tablero.</p>
+            <a href="juego2.html" class="btn-jugar">¡Jugar Ahora!</a>
+        </div>
+
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🚀</div>
+            <h3 class="titulo-juego">Juego 3: Viaje Espacial</h3>
+            <p class="descripcion-juego">Pilota tu nave esquivando meteoritos mientras ordenas los bloques espaciales de menor a mayor.</p>
+            <a href="juego3.html" class="btn-jugar">¡Jugar Ahora!</a>
+        </div>
+
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🏝️</div>
+            <h3 class="titulo-juego">Juego 4: Sobrevive en la Isla</h3>
+            <p class="descripcion-juego">Arrastra y posiciona los signos correctos de Mayor y Menor para activar los puentes de rescate.</p>
+            <a href="juego4.html" class="btn-jugar">¡Jugar Ahora!</a>
+        </div>
+
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🎈</div>
+            <h3 class="titulo-juego">Juego 5: revienta globos</h3>
+            <p class="descripcion-juego">Mira los precios de los productos y ordénalos en las balanzas respetando las indicaciones del mostrador.</p>
+            <a href="juego5.html" class="btn-jugar">¡Jugar Ahora!</a>
+        </div>
+
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🏷️</div>
+            <h3 class="titulo-juego">Juego 6: Verdadero y falso</h3>
+            <p class="descripcion-juego">¡Desafío a contra reloj! Descubre rápidamente si los precios de la tienda dicen la verdad o te engañan.</p>
+            <a href="juego6.html" class="btn-jugar">¡Jugar Ahora!</a>
+        </div>
+
+    </div>
+
+    <button class="btn-reiniciar" onclick="reiniciarTodoProgreso()">🔄 Reiniciar Todo el Progreso</button>
+
     <script>
+        // Al cargar la página, lee los puntos acumulados por el alumno
         window.onload = function() {
-            actualizarMarcador();
-            
-            let puntos = localStorage.getItem("puntajeAcumulado") || 0;
-            let saludo = new SpeechSynthesisUtterance(`Tu puntaje acumulado actual es de ${puntos} puntos.`);
-            saludo.lang = 'es-ES';
-            window.speechSynthesis.speak(saludo);
+            actualizarInterfazProgreso();
         };
 
-        function actualizarMarcador() {
-            let puntajeTotal = localStorage.getItem("puntajeAcumulado") || 0;
-            document.getElementById("total-puntos").innerText = puntajeTotal;
+        function actualizarInterfazProgreso() {
+            let puntos = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+            document.getElementById("puntaje-total").innerText = puntos;
+
+            // Sistema de rangos y medallas motivacionales automáticas
+            let rangoTexto = document.getElementById("rango-texto");
+            if (puntos === 0) {
+                rangoTexto.innerText = "Rango: ¡Listo para empezar el viaje! 🥚";
+            } else if (puntos > 0 && puntos <= 50) {
+                rangoTexto.innerText = "Rango: Explorador Novato de Números 🌟";
+            } else if (puntos > 50 && puntos <= 120) {
+                rangoTexto.innerText = "Rango: Caballero del Signo Mayor ⚔️";
+            } else if (puntos > 120 && puntos <= 200) {
+                rangoTexto.innerText = "Rango: Maestro del Mercado Matemático 🔮";
+            } else {
+                rangoTexto.innerText = "Rango: ¡LEYENDA SUPREMA DE LAS MATEMÁTICAS! 👑🔥";
+            }
         }
 
-        function irALaTienda() {
-            window.location.href = "index.html"; 
-        }
-
-        function reiniciarTodo() {
-            if (confirm("¿Seguro que quieres reiniciar el puntaje de todos los juegos a 0?")) {
+        function reiniciarTodoProgreso() {
+            if (confirm("¿Estás seguro de que deseas borrar los puntos acumulados y empezar de nuevo?")) {
                 localStorage.setItem("puntajeAcumulado", 0);
-                actualizarMarcador();
-                
-                let msg = new SpeechSynthesisUtterance("Puntaje reiniciado con éxito.");
-                msg.lang = 'es-ES';
-                window.speechSynthesis.speak(msg);
+                actualizarInterfazProgreso();
             }
         }
     </script>

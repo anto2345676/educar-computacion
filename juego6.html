@@ -6,45 +6,60 @@
     <title>Tienda Matemática: Juego 6</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body {
-            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
-            background-color: #fff3e0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-        #marcador { position: absolute; top: 20px; right: 20px; background-color: #ff9800; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; }
+        body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #fff3e0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        
+        #marcador { position: absolute; top: 20px; right: 20px; background-color: #ff9800; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         #contenedor-tiempo { position: absolute; top: 20px; width: 300px; background-color: #ddd; border-radius: 10px; overflow: hidden; height: 20px; }
         #barra-tiempo { width: 100%; height: 100%; background-color: #e53935; transition: width 1s linear; }
-        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; }
-        .pantalla-juego { text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 80%; max-width: 600px; }
+        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; transition: transform 0.2s; }
+        #btn-parlante:hover { transform: scale(1.1); }
+        
+        .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 80%; max-width: 600px; box-sizing: border-box; }
+        .pantalla-final { display: none; }
         h2 { color: #e65100; margin-top: 0; }
-        .etiqueta-loca { background-color: #fffde7; border: 4px dashed #fbc02d; border-radius: 15px; padding: 30px; margin: 30px 0; display: flex; align-items: center; justify-content: center; gap: 25px; font-size: 55px; font-weight: bold; color: #333; }
+        
+        .etiqueta-loca { background-color: #fffde7; border: 4px dashed #fbc02d; border-radius: 15px; padding: 30px; margin: 30px 0; display: flex; align-items: center; justify-content: center; gap: 25px; font-size: 55px; font-weight: bold; color: #333; transition: transform 0.3s ease; }
         .signo { color: #d32f2f; font-size: 70px; }
-        .zona-botones { display: flex; justify-content: center; gap: 30px; }
+        
+        .zona-botones { display: flex; justify-content: center; gap: 30px; transition: transform 0.3s ease; }
         .btn-decision { padding: 20px 40px; font-size: 24px; font-weight: bold; border: none; border-radius: 15px; cursor: pointer; color: white; box-shadow: 0 6px rgba(0,0,0,0.2); }
         .btn-decision:active { transform: translateY(4px); box-shadow: none; }
         .verdadero { background-color: #4caf50; box-shadow: 0 6px #388e3c; }
         .falso { background-color: #f44336; box-shadow: 0 6px #d32f2f; }
-        #btn-siguiente { background-color: #2196f3; padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; display: none; margin: 20px auto 0 auto; }
+        
+        #btn-siguiente { background-color: #2196f3; padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; display: none; margin: 20px auto 0 auto; box-shadow: 0 4px #1565c0; }
+        #btn-siguiente:active { transform: translateY(4px); box-shadow: none; }
+        
+        /* Estilo de animación para la voz sincronizada */
+        @keyframes palpitar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(230, 81, 0, 0.4); }
+            100% { transform: scale(1); }
+        }
+        .efecto-hablar {
+            animation: palpitar 0.8s ease-in-out 2;
+            border-color: #e65100 !important;
+            color: #e65100 !important;
+        }
+
+        .btn-menu { background-color: #795548; box-shadow: 0 4px #5d4037; }
+        .btn-menu:active { transform: translateY(4px); box-shadow: none; }
         #mensaje { margin-top: 25px; font-size: 26px; font-weight: bold; }
+        .resultado-puntos { font-size: 32px; color: #e65100; margin: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
     <div id="contenedor-tiempo"><div id="barra-tiempo"></div></div>
-    <div id="marcador">⭐ Puntos Partida: <span id="puntos">0</span></div>
+    <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <div class="pantalla-juego">
+    <!-- PANTALLA PRINCIPAL DEL JUEGO -->
+    <div class="pantalla-juego" id="contenedor-juego">
         <h2 id="titulo-pantalla">Desafío 1</h2>
         <p style="font-size: 18px; color: #666; font-weight: bold;">¿Esta etiqueta de precios dice la verdad o miente?</p>
 
-        <div class="etiqueta-loca">
+        <div class="etiqueta-loca" id="panel-etiqueta">
             <span id="num-izq">0</span>
             <span class="signo" id="signo-medio">?</span>
             <span id="num-der">0</span>
@@ -58,25 +73,72 @@
         <div id="mensaje"></div>
     </div>
 
+    <!-- PANTALLA FINAL DE RESULTADOS -->
+    <div class="pantalla-final" id="contenedor-final">
+        <h2 id="titulo-final">Auditoría de Etiquetas Completada</h2>
+        <p style="font-size: 20px;">Has analizado la veracidad de todas las expresiones matemáticas de la tienda.</p>
+        <div class="resultado-puntos">Sumaste +<span id="puntos-final">0</span> puntos a tu menú</div>
+        <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
+        
+        <div class="controles" style="margin-top: 30px; display: flex; justify-content: center;">
+            <button class="btn-accion btn-decision btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
+        </div>
+    </div>
+
     <script>
         const retos = [
-            { izq: 1500, signo: ">", der: 900, respuestaCorrecta: true, texto: "1500 es mayor que 900" },
-            { izq: 4300, signo: "<", der: 2100, respuestaCorrecta: false, texto: "4300 es menor que 2100" },
-            { izq: 750,  signo: ">", der: 1250, respuestaCorrecta: false, texto: "750 es mayor que 1250" },
-            { izq: 6100, signo: "<", der: 8900, respuestaCorrecta: true, texto: "6100 es menor que 8900" }
+            { 
+                izq: 1500, signo: ">", der: 900, respuestaCorrecta: true, texto: "1500 es mayor que 900",
+                audioSecuencia: [
+                    { texto: "En la izquierda vemos mil quinientos.", resaltar: "num-izq" },
+                    { texto: "Al medio un signo mayor que, frente a novecientos.", resaltar: "num-der" },
+                    { texto: "Determina si el enunciado dice la verdad o es falso.", resaltar: "bloque-decisiones" }
+                ]
+            },
+            { 
+                izq: 4300, signo: "<", der: 2100, respuestaCorrecta: false, texto: "4300 es menor que 2100",
+                audioSecuencia: [
+                    { texto: "Compara cuatro mil trescientos.", resaltar: "num-izq" },
+                    { texto: "Dice que es menor que dos mil cien.", resaltar: "num-der" },
+                    { texto: "Presiona la opción correcta antes de que se agote el tiempo.", resaltar: "bloque-decisiones" }
+                ]
+            },
+            { 
+                izq: 750,  signo: ">", der: 1250, respuestaCorrecta: false, texto: "750 es mayor que 1250",
+                audioSecuencia: [
+                    { texto: "Evaluemos setecientos cincuenta.", resaltar: "num-izq" },
+                    { texto: "Aparece como mayor que mil doscientos cincuenta.", resaltar: "num-der" },
+                    { texto: "Elige tu respuesta ahora.", resaltar: "bloque-decisiones" }
+                ]
+            },
+            { 
+                izq: 6100, signo: "<", der: 8900, respuestaCorrecta: true, texto: "6100 es menor que 8900",
+                audioSecuencia: [
+                    { texto: "Por último, seis mil cien.", resaltar: "num-izq" },
+                    { texto: "Frente al valor de ocho mil novecientos.", resaltar: "num-der" },
+                    { texto: "Elige si la etiqueta miente o está en lo correcto.", resaltar: "bloque-decisiones" }
+                ]
+            }
         ];
 
         let nivelActual = 0;
-        let puntajeJuegoActual = 0;
+        let puntosGanadosEsteJuego = 0;
         let tiempoRestante = 15;
-        let temporizador;
+        let temporizador = null;
         let respondido = false;
+        let explicando = false; // Nueva bandera de control
 
-        cargarReto();
+        function obtenerPuntajeGlobal() {
+            return parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+        }
+
+        function actualizarMarcadorVisual() {
+            document.getElementById("puntos").innerText = obtenerPuntajeGlobal();
+        }
 
         function cargarReto() {
             if (nivelActual >= retos.length) {
-                terminarJuego();
+                mostrarPantallaFinal();
                 return;
             }
 
@@ -84,7 +146,6 @@
             tiempoRestante = 15;
             document.getElementById("titulo-pantalla").innerText = `Desafío ${nivelActual + 1} de ${retos.length}`;
             document.getElementById("mensaje").innerText = "";
-            document.getElementById("puntos").innerText = puntajeJuegoActual;
             
             document.getElementById("num-izq").innerText = `$${retos[nivelActual].izq}`;
             document.getElementById("signo-medio").innerText = retos[nivelActual].signo;
@@ -93,26 +154,46 @@
             document.getElementById("bloque-decisiones").style.display = "flex";
             document.getElementById("btn-siguiente").style.display = "none";
             document.getElementById("barra-tiempo").style.width = "100%";
+            document.getElementById("contenedor-tiempo").style.display = "block";
 
-            clearInterval(temporizador);
-            temporizador = setInterval(reducirTiempo, 1000);
-            leerTexto(`¿Es verdadero o falso que, ${retos[nivelActual].texto}?`);
+            // Detener cualquier conteo previo mientras se inicia la explicación
+            detenerTemporizador();
+            
+            // Lanza la lectura del enunciado inicial
+            leerTextoEnunciado(`¿Es verdadero o falso que, ${retos[nivelActual].texto}?`);
+            actualizarMarcadorVisual();
+        }
+
+        function iniciarTemporizador() {
+            if (temporizador === null && !respondido) {
+                temporizador = setInterval(reducirTiempo, 1000);
+            }
+        }
+
+        function detenerTemporizador() {
+            if (temporizador !== null) {
+                clearInterval(temporizador);
+                temporizador = null;
+            }
         }
 
         function reducirTiempo() {
-            if (respondido) return;
+            if (respondido || explicando) return;
             tiempoRestante--;
             document.getElementById("barra-tiempo").style.width = `${(tiempoRestante / 15) * 100}%`;
 
             if (tiempoRestante <= 0) {
-                clearInterval(temporizador);
+                detenerTemporizador();
                 evaluarRespuesta(null);
             }
         }
 
         function responder(eleccionUsuario) {
             if (respondido) return;
-            clearInterval(temporizador);
+            // Detener permanentemente el reloj de este turno
+            detenerTemporizador();
+            window.speechSynthesis.cancel();
+            explicando = false;
             respondido = true;
             evaluarRespuesta(eleccionUsuario === retos[nivelActual].respuestaCorrecta);
         }
@@ -120,38 +201,140 @@
         function evaluarRespuesta(resultado) {
             document.getElementById("bloque-decisiones").style.display = "none";
             document.getElementById("btn-siguiente").style.display = "block";
+            document.getElementById("contenedor-tiempo").style.display = "none";
             const msg = document.getElementById("mensaje");
 
             if (resultado === true) {
                 msg.innerText = "¡Excelente Supervisor! Detectaste el valor real. 🌟";
                 msg.style.color = "green";
-                puntajeJuegoActual += 10;
-                document.getElementById("puntos").innerText = puntajeJuegoActual;
+                
+                puntosGanadosEsteJuego += 10;
+                let nuevoTotal = obtenerPuntajeGlobal() + 10;
+                localStorage.setItem("puntajeAcumulado", nuevoTotal);
+                actualizarMarcadorVisual();
+                
                 confetti({ particleCount: 50, spread: 40, origin: { y: 0.7 } });
-                leerTexto("¡Excelente! Respuesta correcta.");
+                leerTextoSimple("¡Excelente! Respuesta correcta.");
             } else if (resultado === false) {
                 msg.innerText = "¡Oh no! La etiqueta te ha engañado. 🧩";
                 msg.style.color = "red";
-                leerTexto("Oh, te has equivocado.");
+                leerTextoSimple("Oh, te has equivocado en esta etiqueta.");
             } else {
                 msg.innerText = "⏰ ¡Se agotó el tiempo!";
                 msg.style.color = "orange";
-                leerTexto("Se acabó el tiempo.");
+                leerTextoSimple("Se acabó el tiempo límite.");
             }
         }
 
-        function avanzarNivel() { nivelActual++; cargarReto(); }
+        function avanzarNivel() { 
+            nivelActual++; 
+            cargarReto(); 
+        }
 
-        function terminarJuego() {
-            clearInterval(temporizador);
+        function mostrarPantallaFinal() {
+            detenerTemporizador();
             window.speechSynthesis.cancel();
-            let acumulado = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
-            localStorage.setItem("puntajeAcumulado", acumulado + puntajeJuegoActual);
+            explicando = false;
+
+            document.getElementById("contenedor-juego").style.display = "none";
+            document.getElementById("contenedor-tiempo").style.display = "none";
+            document.getElementById("contenedor-final").style.display = "block";
+            document.getElementById("puntos-final").innerText = puntosGanadosEsteJuego;
+
+            const tituloFinal = document.getElementById("titulo-final");
+            const mensajeEval = document.getElementById("mensaje-final-evaluacion");
+
+            if (puntosGanadosEsteJuego === retos.length * 10) {
+                confetti({ particleCount: 180, spread: 100, origin: { y: 0.6 } });
+                tituloFinal.innerText = "¡Auditoría Perfecta! 🎉";
+                mensajeEval.innerText = "¡Increíble! Ninguna etiqueta pudo engañarte.";
+                mensajeEval.style.color = "green";
+                leerTextoSimple(`¡Excelente! Lograste una puntuación perfecta. Sumaste ${puntosGanadosEsteJuego} puntos a tu menú total.`);
+            } else {
+                tituloFinal.innerText = "¡Terminaste el Desafío! 👍";
+                mensajeEval.innerText = `Conseguiste resolver correctamente los enunciados de la tienda.`;
+                mensajeEval.style.color = "#e65100";
+                leerTextoSimple(`Desafío completado. Acumulaste ${puntosGanadosEsteJuego} puntos para tu menú. ¡Sigue adelante!`);
+            }
+        }
+
+        // Función para leer el enunciado inicial pausando y reanudando el tiempo
+        function leerTextoEnunciado(texto) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(texto);
+            u.lang = 'es-ES';
+
+            u.onstart = () => {
+                explicando = true;
+                detenerTemporizador();
+            };
+
+            u.onend = () => {
+                explicando = false;
+                iniciarTemporizador();
+            };
+
+            window.speechSynthesis.speak(u);
+        }
+
+        // Función para la secuencia de indicaciones extendidas por pasos
+        function leerSecuencia(secuencia, indice = 0) {
+            if (indice >= secuencia.length) {
+                explicando = false;
+                iniciarTemporizador(); // Reanuda cuando termina toda la secuencia
+                return;
+            }
+
+            const paso = secuencia[indice];
+            const elementoHTML = document.getElementById(paso.resaltar);
+
+            const u = new SpeechSynthesisUtterance(paso.texto);
+            u.lang = 'es-ES';
+
+            u.onstart = () => {
+                explicando = true;
+                detenerTemporizador(); // Pausa el reloj mientras habla cada tramo
+                if (elementoHTML) elementoHTML.classList.add("efecto-hablar");
+            };
+
+            u.onend = () => {
+                if (elementoHTML) elementoHTML.classList.remove("efecto-hablar");
+                leerSecuencia(secuencia, indice + 1);
+            };
+
+            window.speechSynthesis.speak(u);
+        }
+
+        function leerTextoSimple(t) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(t);
+            u.lang = 'es-ES';
+            window.speechSynthesis.speak(u);
+        }
+
+        function leerIndicaciones() {
+            window.speechSynthesis.cancel();
+            document.getElementById("num-izq").classList.remove("efecto-hablar");
+            document.getElementById("num-der").classList.remove("efecto-hablar");
+            document.getElementById("bloque-decisiones").classList.remove("efecto-hablar");
+
+            if (nivelActual < retos.length && !respondido) {
+                leerSecuencia(retos[nivelActual].audioSecuencia);
+            } else if (nivelActual >= retos.length) {
+                leerTextoSimple("La partida ha concluido. Regresa al menú usando el botón marrón.");
+            } else {
+                leerTextoSimple("Presiona el botón azul para avanzar al siguiente desafío de etiquetas.");
+            }
+        }
+
+        function irAMenu() {
+            window.speechSynthesis.cancel();
             window.location.href = "4basico.html";
         }
 
-        function leerTexto(t) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'es-ES'; window.speechSynthesis.speak(u); }
-        function leerIndicaciones() { leerTexto("Mira la comparación y presiona el botón verde si es verdadera, o el botón rojo si es falsa antes de que se termine el tiempo."); }
+        window.onload = () => {
+            cargarReto();
+        };
     </script>
 </body>
 </html>
