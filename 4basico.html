@@ -72,7 +72,7 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
             position: relative;
         }
 
@@ -100,12 +100,22 @@
             flex-grow: 1;
         }
 
+        /* Fila de Controles Inferiores en Tarjeta */
+        .fila-controles {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            margin-top: auto;
+        }
+
         /* Botón de Jugar */
         .btn-jugar {
             background-color: #00bfff;
             color: white;
             border: none;
-            padding: 12px 30px;
+            padding: 12px 20px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 25px;
@@ -113,7 +123,8 @@
             text-decoration: none;
             box-shadow: 0 4px #0099cc;
             transition: background-color 0.2s, transform 0.1s;
-            width: 80%;
+            flex-grow: 1;
+            text-align: center;
         }
 
         .btn-jugar:hover {
@@ -123,6 +134,31 @@
         .btn-jugar:active {
             transform: translateY(2px);
             box-shadow: none;
+        }
+
+        /* Botón Parlante por Tarjeta */
+        .btn-tarjeta-parlante {
+            font-size: 28px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+        .btn-tarjeta-parlante:hover {
+            transform: scale(1.15);
+        }
+
+        /* Estilo Animación de Pálpito de Voz */
+        @keyframes palpitarTarjeta {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(0, 191, 255, 0.5); }
+            100% { transform: scale(1); }
+        }
+        .efecto-hablar {
+            animation: palpitarTarjeta 1s ease-in-out infinite;
+            border-color: #00bfff !important;
         }
 
         /* Botón reiniciar progreso */
@@ -160,46 +196,64 @@
 
     <div class="contenedor-juegos">
 
-        <div class="tarjeta-juego">
-            <div class="icono-juego">🍩</div>
-            <h3 class="titulo-juego">Juego 1: La cafeteria</h3>
-            <p class="descripcion-juego">Desifra la cantidad de postres y resuelve los ejercisios</p>
-            <a href="juego.html" class="btn-jugar">¡Jugar Ahora!</a>
+        <div class="tarjeta-juego" id="tarjeta-1">
+            <div class="icono-juego">🦖</div>
+            <h3 class="titulo-juego">Juego 1: Isla Dinosaurio</h3>
+            <p class="descripcion-juego" id="desc-1">Descubre qué criatura es más grande o pequeña contando y comparando los elementos prehistóricos.</p>
+            <div class="fila-controles">
+                <a href="juego.html" class="btn-jugar">¡Jugar Ahora!</a>
+                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(1, 'Juego uno, Isla Dinosaurio. Descubre qué criatura es más grande o pequeña contando y comparando los elementos prehistóricos.')">🔊</button>
+            </div>
         </div>
 
-        <div class="tarjeta-juego">
-            <div class="icono-juego">🛒</div>
-            <h3 class="titulo-juego">Juego 2: Tienda</h3>
-            <p class="descripcion-juego">Ayuda al mago a ordenar sus pociones numéricas utilizando las reglas lógicas del tablero.</p>
-            <a href="juego2.html" class="btn-jugar">¡Jugar Ahora!</a>
+        <div class="tarjeta-juego" id="tarjeta-2">
+            <div class="icono-juego">🧙‍♂️</div>
+            <h3 class="titulo-juego">Juego 2: El Mago de los Números</h3>
+            <p class="descripcion-juego" id="desc-2">Ayuda al mago a ordenar sus pociones numéricas utilizando las reglas lógicas del tablero.</p>
+            <div class="fila-controles">
+                <a href="juego2.html" class="btn-jugar">¡Jugar Ahora!</a>
+                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(2, 'Juego dos, El Mago de los Números. Ayuda al mago a ordenar sus pociones numéricas utilizando las reglas lógicas del tablero.')">🔊</button>
+            </div>
         </div>
 
-        <div class="tarjeta-juego">
+        <div class="tarjeta-juego" id="tarjeta-3">
             <div class="icono-juego">🚀</div>
             <h3 class="titulo-juego">Juego 3: Viaje Espacial</h3>
-            <p class="descripcion-juego">Pilota tu nave esquivando meteoritos mientras ordenas los bloques espaciales de menor a mayor.</p>
-            <a href="juego3.html" class="btn-jugar">¡Jugar Ahora!</a>
+            <p class="descripcion-juego" id="desc-3">Pilota tu nave esquivando meteoritos mientras ordenas los bloques espaciales de menor a mayor.</p>
+            <div class="fila-controles">
+                <a href="juego3.html" class="btn-jugar">¡Jugar Ahora!</a>
+                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(3, 'Juego tres, Viaje Espacial. Pilota tu nave esquivando meteoritos mientras ordenas los bloques espaciales de menor a mayor.')">🔊</button>
+            </div>
         </div>
 
-        <div class="tarjeta-juego">
+        <div class="tarjeta-juego" id="tarjeta-4">
             <div class="icono-juego">🏝️</div>
             <h3 class="titulo-juego">Juego 4: Sobrevive en la Isla</h3>
-            <p class="descripcion-juego">Arrastra y posiciona los signos correctos de Mayor y Menor para activar los puentes de rescate.</p>
-            <a href="juego4.html" class="btn-jugar">¡Jugar Ahora!</a>
+            <p class="descripcion-juego" id="desc-4">Arrastra y posiciona los signos correctos de Mayor y Menor para activar los puentes de rescate.</p>
+            <div class="fila-controles">
+                <a href="isladesierta.html" class="btn-jugar">¡Jugar Ahora!</a>
+                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(4, 'Juego cuatro, Sobrevive en la Isla. Arrastra y posiciona los signos correctos de Mayor y Menor para activar los puentes de rescate.')">🔊</button>
+            </div>
         </div>
 
-        <div class="tarjeta-juego">
-            <div class="icono-juego">🎈</div>
-            <h3 class="titulo-juego">Juego 5: revienta globos</h3>
-            <p class="descripcion-juego">Mira los precios de los productos y ordénalos en las balanzas respetando las indicaciones del mostrador.</p>
-            <a href="juego5.html" class="btn-jugar">¡Jugar Ahora!</a>
+        <div class="tarjeta-juego" id="tarjeta-5">
+            <div class="icono-juego">🛒</div>
+            <h3 class="titulo-juego">Juego 5: El Gran Mercado</h3>
+            <p class="descripcion-juego" id="desc-5">Mira los precios de los productos y ordénalos en las balanzas respetando las indicaciones del mostrador.</p>
+            <div class="fila-controles">
+                <a href="tienda5.html" class="btn-jugar">¡Jugar Ahora!</a>
+                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(5, 'Juego cinco, El Gran Mercado. Mira los precios de los productos y ordénalos en las balanzas respetando las indicaciones del mostrador.')">🔊</button>
+            </div>
         </div>
 
-        <div class="tarjeta-juego">
+        <div class="tarjeta-juego" id="tarjeta-6">
             <div class="icono-juego">🏷️</div>
-            <h3 class="titulo-juego">Juego 6: Verdadero y falso</h3>
-            <p class="descripcion-juego">¡Desafío a contra reloj! Descubre rápidamente si los precios de la tienda dicen la verdad o te engañan.</p>
-            <a href="juego6.html" class="btn-jugar">¡Jugar Ahora!</a>
+            <h3 class="titulo-juego">Juego 6: Etiquetas Locas</h3>
+            <p class="descripcion-juego" id="desc-6">¡Desafío a contra reloj! Descubre rápidamente si los precios de la tienda dicen la verdad o te engañan.</p>
+            <div class="fila-controles">
+                <a href="tienda6.html" class="btn-jugar">¡Jugar Ahora!</a>
+                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(6, 'Juego seis, Etiquetas Locas. Desafío a contra reloj. Descubre rápidamente si los precios de la tienda dicen la verdad o te engañan.')">🔊</button>
+            </div>
         </div>
 
     </div>
@@ -207,7 +261,6 @@
     <button class="btn-reiniciar" onclick="reiniciarTodoProgreso()">🔄 Reiniciar Todo el Progreso</button>
 
     <script>
-        // Al cargar la página, lee los puntos acumulados por el alumno
         window.onload = function() {
             actualizarInterfazProgreso();
         };
@@ -216,7 +269,6 @@
             let puntos = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
             document.getElementById("puntaje-total").innerText = puntos;
 
-            // Sistema de rangos y medallas motivacionales automáticas
             let rangoTexto = document.getElementById("rango-texto");
             if (puntos === 0) {
                 rangoTexto.innerText = "Rango: ¡Listo para empezar el viaje! 🥚";
@@ -231,7 +283,33 @@
             }
         }
 
+        function limpiarEfectosVisuales() {
+            const tarjetas = document.querySelectorAll('.tarjeta-juego');
+            tarjetas.forEach(t => t.classList.remove('efecto-hablar'));
+        }
+
+        function leerDescripcion(idJuego, textoNavegacion) {
+            window.speechSynthesis.cancel();
+            limpiarEfectosVisuales();
+
+            const tarjetaObjetivo = document.getElementById(`tarjeta-${idJuego}`);
+            const u = new SpeechSynthesisUtterance(textoNavegacion);
+            u.lang = 'es-ES';
+
+            u.onstart = function() {
+                if (tarjetaObjetivo) tarjetaObjetivo.classList.add('efecto-hablar');
+            };
+
+            u.onend = function() {
+                if (tarjetaObjetivo) tarjetaObjetivo.classList.remove('efecto-hablar');
+            };
+
+            window.speechSynthesis.speak(u);
+        }
+
         function reiniciarTodoProgreso() {
+            window.speechSynthesis.cancel();
+            limpiarEfectosVisuales();
             if (confirm("¿Estás seguro de que deseas borrar los puntos acumulados y empezar de nuevo?")) {
                 localStorage.setItem("puntajeAcumulado", 0);
                 actualizarInterfazProgreso();
