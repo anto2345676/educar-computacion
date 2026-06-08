@@ -3,128 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de Mayor y Menor</title>
+    <title>Supervivencia: La Balsa en Llamas</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #f0f8ff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        body { 
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif; 
+            background: linear-gradient(180deg, #111 0%, #d93d1a 100%); 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+            overflow: hidden; 
+        }
         
-        #marcador { position: absolute; top: 20px; right: 20px; background-color: #ffcc00; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333; }
-        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; transition: transform 0.2s; }
-        #btn-parlante:hover { transform: scale(1.1); }
+        #marcador { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background-color: #ffb703; 
+            color: #023047; 
+            padding: 12px 24px; 
+            border-radius: 20px; 
+            font-size: 22px; 
+            font-weight: bold; 
+            box-shadow: 0 6px 0 #fb8500;
+            border: 3px solid #023047;
+        }
 
-        .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); min-width: 450px; max-width: 600px; width: 85%; }
+        @keyframes parpadeoFuerte {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px #fff); background-color: transparent; }
+            50% { transform: scale(1.3); filter: drop-shadow(0 0 25px #ffb703); background-color: rgba(255,183,3,0.4); border-radius: 50%; }
+            100% { transform: scale(1); filter: drop-shadow(0 0 5px #fff); background-color: transparent; }
+        }
+
+        #btn-parlante { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            font-size: 45px; 
+            cursor: pointer; 
+            background: none; 
+            border: none; 
+            padding: 5px;
+            transition: all 0.3s;
+        }
+
+        .parlante-alerta {
+            animation: parpadeoFuerte 0.8s ease-in-out infinite;
+        }
+        
+        .contenedor-isla { 
+            text-align: center; 
+            background: #2b2d42; 
+            padding: 25px; 
+            border-radius: 30px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
+            width: 90%; 
+            max-width: 700px; 
+            border: 5px solid #ef233c;
+        }
+
         .pantalla-final { display: none; }
         
-        .zona-comparacion { display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 40px; }
-        .numero { font-size: 64px; font-weight: bold; color: #333; cursor: pointer; padding: 10px; transition: transform 0.3s ease; }
-        
-        .casilla-destino { width: 100px; height: 100px; border: 4px dashed #bbb; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 64px; font-weight: bold; background-color: #fafafa; transition: transform 0.3s ease, border-color 0.3s ease; }
+        h2 { color: #ffb703; margin-top: 0; font-size: 26px; }
 
-        .zona-signos { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; background: #eef1f6; padding: 15px; border-radius: 15px; border: 2px dashed #b0bec5; transition: transform 0.3s ease; }
-        .signo { font-size: 64px; font-weight: bold; width: 90px; height: 90px; background-color: #4da6ff; color: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: grab; user-select: none; box-shadow: 0 6px rgba(0, 74, 153, 1); }
-        .signo:active { cursor: grabbing; }
-
-        /* Estilo de animación para la voz sincronizada */
-        @keyframes palpitar {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(77, 166, 255, 0.5); }
-            100% { transform: scale(1); }
-        }
-        .efecto-hablar {
-            animation: palpitar 0.8s ease-in-out 2;
-            border-color: #4da6ff !important;
-            color: #4da6ff !important;
+        #pantalla-animacion {
+            background: linear-gradient(180deg, #2a9d8f 0%, #e76f51 100%);
+            border-radius: 20px;
+            border: 4px solid #3d2612;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
         }
 
-        .controles { display: flex; gap: 20px; justify-content: center; }
-        button.btn-accion { padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; box-shadow: 0 4px rgba(0,0,0,0.2); }
-        #btn-siguiente { background-color: #ff9f1c; }
-        #btn-validar-final { background-color: #2ec4b6; display: none; }
-        .btn-menu { background-color: #795548; }
+        .zona-operacion {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .numero-isla {
+            font-size: 36px;
+            font-weight: bold;
+            color: #fff;
+            background: #8d99ae;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border-bottom: 4px solid #4a4e69;
+        }
+
+        .incognita-signo {
+            font-size: 40px;
+            font-weight: bold;
+            color: #ef233c;
+            width: 70px;
+            height: 70px;
+            background: #edf2f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #ef233c;
+        }
+
+        .teclado-signos { 
+            display: flex; 
+            gap: 20px; 
+            justify-content: center; 
+            margin-bottom: 10px; 
+        }
         
-        button.btn-accion:active { transform: translateY(4px); box-shadow: none; }
-        #mensaje { margin-top: 20px; font-size: 24px; font-weight: bold; }
-        .resultado-puntos { font-size: 32px; color: #2e7d32; margin: 20px 0; font-weight: bold; }
+        .btn-signo { 
+            width: 80px; 
+            height: 80px; 
+            font-size: 45px; 
+            font-weight: bold; 
+            color: #fff; 
+            background-color: #634832; 
+            border: 3px solid #3d2612; 
+            border-radius: 15px; 
+            cursor: pointer; 
+            box-shadow: 0 6px 0 #3d2612; 
+            transition: all 0.1s ease; 
+        }
+        .btn-signo:active { 
+            box-shadow: 0 2px #3d2612; 
+            transform: translateY(4px); 
+        }
+
+        .controles-finales {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-accion-final {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .btn-reintentar-juego { background-color: #f4a261; box-shadow: 0 4px 0 #b15b00; }
+        .btn-menu { background-color: #457b9d; box-shadow: 0 4px 0 #2a4d6c; }
+        
+        #mensaje { margin-top: 15px; font-size: 22px; font-weight: bold; min-height: 30px; }
     </style>
 </head>
 <body>
 
-    <button id="btn-parlante" onclick="leerIndicaciones()" title="Escuchar indicaciones">🔊</button>
+    <button id="btn-parlante" class="parlante-alerta" onclick="leerIndicaciones()">🔊</button>
     <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <div class="pantalla-juego" id="contenedor-juego">
-        <h2 id="titulo-pantalla" style="color: #4da6ff; margin-top: 0;">¡A jugar!</h2>
-
-        <div class="zona-comparacion" id="area-comparacion">
-            <div class="numero" id="num1" onclick="leerTextoSimple(this.innerText)">0</div>
-            <div class="casilla-destino" id="destino" ondragover="permitirSoltar(event)" ondrop="soltarSigno(event)">?</div>
-            <div class="numero" id="num2" onclick="leerTextoSimple(this.innerText)">0</div>
+    <div class="contenedor-isla" id="contenedor-juego">
+        <h2 id="titulo-juego">¡Salva al Monito de las Llamas! 🔥🐒</h2>
+        
+        <canvas id="pantalla-animacion" width="600" height="200"></canvas>
+        
+        <div class="zona-operacion">
+            <div class="numero-isla" id="num-izq">0</div>
+            <div class="incognita-signo" id="pantalla-operador">?</div>
+            <div class="numero-isla" id="num-der">0</div>
         </div>
-
-        <div class="zona-signos" id="contenedor-signos">
-            <div class="signo" id="mayor" draggable="true" ondragstart="arrastrar(event)" onclick="leerSigno('mayor')">&gt;</div>
-            <div class="signo" id="menor" draggable="true" ondragstart="arrastrar(event)" onclick="leerSigno('menor')">&lt;</div>
+        
+        <div class="teclado-signos" id="bloque-teclado">
+            <button class="btn-signo" onclick="jugarSigno('>')">&gt;</button>
+            <button class="btn-signo" onclick="jugarSigno('=')">=</button>
+            <button class="btn-signo" onclick="jugarSigno('<')">&lt;</button>
         </div>
-
-        <div class="controles">
-            <button class="btn-accion" id="btn-siguiente" onclick="registrarYAvanzar()">Siguiente Nivel</button>
-            <button class="btn-accion" id="btn-validar-final" onclick="validarTodoElJuego()">Validar Juego</button>
-        </div>
-
         <div id="mensaje"></div>
     </div>
 
-    <div class="pantalla-final" id="contenedor-final">
-        <h2 id="titulo-final">Desafío Terminado</h2>
-        <p style="font-size: 20px;">Has evaluado todas las expresiones numéricas.</p>
-        <div class="resultado-puntos">Sumaste +<span id="puntos-final">0</span> puntos a tu menú</div>
-        <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
+    <div class="contenedor-isla pantalla-final" id="contenedor-final">
+        <h2 id="resultado-titulo-final">🏆 ¡JUEGO TERMINADO! 🏆</h2>
+        <p id="resultado-texto-final" style="font-size: 20px;"></p>
+        <div style="font-size: 30px; color: #ffb703; margin: 20px 0; font-weight: bold;">Sumaste +<span id="puntos-final">0</span> puntos de rescate</div>
         
-        <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
-            <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
+        <div class="controles-finales">
+            <!-- Ambos botones se quedan fijos uno al lado del otro (o arriba y abajo) para el niño -->
+            <button class="btn-accion-final btn-reintentar-juego" onclick="reiniciarJuegoCompleto()">🔄 Volver a Intentar Juego</button>
+            <button class="btn-accion-final btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
         </div>
     </div>
 
     <script>
         const niveles = [
-            { 
-                n1: 100, n2: 60, correcto: ">",
-                audioSecuencia: [
-                    { texto: "A la izquierda tenemos el número 100.", resaltar: "num1" },
-                    { texto: "A la derecha tenemos el número 60.", resaltar: "num2" },
-                    { texto: "Arrastra el signo correcto de la zona inferior al recuadro del centro.", resaltar: "contenedor-signos" }
-                ]
-            },
-            { 
-                n1: 500, n2: 1000, correcto: "<",
-                audioSecuencia: [
-                    { texto: "Compara quinientos...", resaltar: "num1" },
-                    { texto: "...con el número mil.", resaltar: "num2" },
-                    { texto: "Coloca el signo correspondiente en la casilla.", resaltar: "destino" }
-                ]
-            },
-            { 
-                n1: 8000, n2: 5964, correcto: ">",
-                audioSecuencia: [
-                    { texto: "Tenemos ocho mil en el sector izquierdo.", resaltar: "num1" },
-                    { texto: "Y cinco mil novecientos sesenta y cuatro a la derecha.", resaltar: "num2" },
-                    { texto: "Elige qué operador los compara de manera correcta.", resaltar: "contenedor-signos" }
-                ]
-            },
-            { 
-                n1: 5384, n2: 9769, correcto: "<",
-                audioSecuencia: [
-                    { texto: "Por último, cinco mil trescientos ochenta y cuatro.", resaltar: "num1" },
-                    { texto: "Frente a nueve mil setecientos sesenta y nueve.", resaltar: "num2" },
-                    { texto: "Arrastra el signo final.", resaltar: "destino" }
-                ]
-            }
+            { izq: 75, der: 25, correcto: ">", exito: "¡Correcto! 75 es mayor que 25.", fallo: "¡Error! La balsa se quema." },
+            { izq: 90, der: 90, correcto: "=", exito: "¡Muy bien! Ambos son iguales.", fallo: "¡Cuidado! El fuego se extiende." },
+            { izq: 120, der: 180, correcto: "<", exito: "¡Excelente! 120 es menor que 180.", fallo: "¡Alerta! Tramo dañado por el fuego." },
+            { izq: 340, der: 210, correcto: ">", exito: "¡Genial! 340 es mayor que 210.", fallo: "¡Balsa destruida!" }
         ];
 
         let nivelActual = 0;
+        let errores = 0; 
         let puntosGanadosEsteJuego = 0;
-        let signoSeleccionado = "";
-        let respuestasUsuario = [];
+        
+        const canvas = document.getElementById("pantalla-animacion");
+        const ctx = canvas.getContext("2d");
+        let anguloMovimiento = 0;
+        let particulasFuego = [];
 
         function obtenerPuntajeGlobal() {
             return parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
@@ -134,160 +223,168 @@
             document.getElementById("puntos").innerText = obtenerPuntajeGlobal();
         }
 
-        function cargarNivel() {
-            document.getElementById("titulo-pantalla").innerText = `Nivel ${nivelActual + 1} de ${niveles.length}`;
-            document.getElementById("num1").innerText = niveles[nivelActual].n1;
-            document.getElementById("num2").innerText = niveles[nivelActual].n2;
-            
-            const destino = document.getElementById("destino");
-            destino.innerText = "?";
-            destino.style.backgroundColor = "#fafafa";
-            signoSeleccionado = "";
-
-            document.getElementById("btn-siguiente").style.display = "inline-block";
-            document.getElementById("btn-validar-final").style.display = "none";
-            document.getElementById("mensaje").innerText = "";
-
-            actualizarMarcadorVisual();
-        }
-
-        function registrarYAvanzar() {
-            if (signoSeleccionado === "") {
-                leerTextoSimple("Por favor, debes arrastrar un signo antes de continuar.");
+        function cargarNivel(numNivel) {
+            if (numNivel >= niveles.length) {
+                terminarJuego(errores < 4);
                 return;
             }
 
-            respuestasUsuario[nivelActual] = signoSeleccionado;
-            nivelActual++;
+            const datos = niveles[numNivel];
+            document.getElementById("num-izq").innerText = datos.izq;
+            document.getElementById("num-der").innerText = datos.der;
+            document.getElementById("pantalla-operador").innerText = "?";
+            document.getElementById("mensaje").innerText = "";
+            activarBotones(true);
+            actualizarMarcadorVisual();
+        }
 
-            if (nivelActual < niveles.length) {
-                cargarNivel();
+        function activarBotones(activar) {
+            const botones = document.querySelectorAll(".btn-signo");
+            botones.forEach(b => b.disabled = !activar);
+        }
+
+        function jugarSigno(signo) {
+            const datos = niveles[nivelActual];
+            document.getElementById("pantalla-operador").innerText = signo;
+            activarBotones(false);
+
+            if (signo === datos.correcto) {
+                confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
+                document.getElementById("mensaje").innerText = datos.exito;
+                document.getElementById("mensaje").style.color = "#4c9a2a";
+                puntosGanadosEsteJuego += 10;
+                localStorage.setItem("puntajeAcumulado", obtenerPuntajeGlobal() + 10);
+                actualizarMarcadorVisual();
+                leerTextoSimple("¡Excelente!");
+
+                setTimeout(() => {
+                    nivelActual++;
+                    cargarNivel(nivelActual);
+                }, 2000);
+
             } else {
-                pantallaDeValidacionFinal();
+                errores++;
+                document.getElementById("mensaje").innerText = datos.fallo;
+                document.getElementById("mensaje").style.color = "#ef233c";
+                leerTextoSimple("Respuesta incorrecta. El fuego sigue encendido.");
+                
+                generarFuegoFijo(220 + ((errores - 1) * 40) + 15, 130);
+
+                setTimeout(() => {
+                    if (errores >= 4) {
+                        terminarJuego(false);
+                    } else {
+                        nivelActual++;
+                        cargarNivel(nivelActual);
+                    }
+                }, 2500);
             }
         }
 
-        function pantallaDeValidacionFinal() {
-            document.getElementById("titulo-pantalla").innerText = "¡Ejercicios Completados!";
-            document.getElementById("mensaje").innerText = "Presiona el botón para revisar tus resultados.";
-            document.getElementById("mensaje").style.color = "#333";
-            
-            document.getElementById("area-comparacion").style.display = "none";
-            document.getElementById("contenedor-signos").style.display = "none";
-
-            document.getElementById("btn-siguiente").style.display = "none";
-            document.getElementById("btn-validar-final").style.display = "inline-block";
-            
-            leerTextoSimple("Has terminado de responder. Presiona el botón validar juego para descubrir tu puntaje.");
+        function generarFuegoFijo(x, y) {
+            particulasFuego.push({ x: x, y: y });
         }
 
-        function validarTodoElJuego() {
-            let aciertos = 0;
-
-            for (let i = 0; i < niveles.length; i++) {
-                if (respuestasUsuario[i] === niveles[i].correcto) {
-                    aciertos++;
-                }
-            }
-
-            puntosGanadosEsteJuego = aciertos * 10;
+        function reiniciarJuegoCompleto() {
+            nivelActual = 0;
+            errores = 0;
+            puntosGanadosEsteJuego = 0;
+            particulasFuego = []; 
             
-            // Sumar de forma acumulativa y guardar en la memoria persistente del navegador
-            let nuevoTotal = obtenerPuntajeGlobal() + puntosGanadosEsteJuego;
-            localStorage.setItem("puntajeAcumulado", nuevoTotal);
+            document.getElementById("contenedor-final").style.display = "none";
+            document.getElementById("contenedor-juego").style.display = "block";
+            document.getElementById("btn-parlante").classList.add("parlante-alerta"); 
+            
+            cargarNivel(0);
+        }
 
-            // Mostrar Pantalla Final Estructurada
+        function terminarJuego(ganado) {
             document.getElementById("contenedor-juego").style.display = "none";
             document.getElementById("contenedor-final").style.display = "block";
             document.getElementById("puntos-final").innerText = puntosGanadosEsteJuego;
 
-            const tituloFinal = document.getElementById("titulo-final");
-            const mensajeEval = document.getElementById("mensaje-final-evaluacion");
+            const titulo = document.getElementById("resultado-titulo-final");
+            const texto = document.getElementById("resultado-texto-final");
 
-            if (aciertos === niveles.length) {
-                confetti({ particleCount: 180, spread: 100, origin: { y: 0.6 } });
-                tituloFinal.innerText = "¡Juego Perfecto! 🎉";
-                mensajeEval.innerText = "¡Excelente! Todas tus respuestas son correctas.";
-                mensajeEval.style.color = "green";
-                leerTextoSimple(`¡Excelente! Todas están buenas. Sumaste ${puntosGanadosEsteJuego} puntos a tu menú. ¡Felicitaciones!`);
+            if (ganado && errores < 4) {
+                titulo.innerText = "🐒 ¡MONITO SALVADO! 🐒";
+                texto.innerText = "¡Increíble! Lograste responder los desafíos y la balsa resistió lo suficiente para llegar a la costa sin hundirse.";
+                leerTextoSimple("¡Felicidades! Salvaste al monito. Elige si quieres jugar otra vez o salir.");
             } else {
-                tituloFinal.innerText = "¡Buen intento! 👍";
-                mensajeEval.innerText = `Lograste ${aciertos} de ${niveles.length} respuestas correctas.`;
-                mensajeEval.style.color = "#e65100";
-                leerTextoSimple(`Terminaste el juego. Lograste sumarle ${puntosGanadosEsteJuego} puntos a tu menú. ¡Sigue practicando!`);
+                titulo.innerText = "🔥 LA BALSA SE HUNDIÓ 🔥";
+                texto.innerText = "¡Oh no! Demasiados incendios rompieron los soportes de madera y el monito cayó al agua. ¡Elige si quieres intentarlo de nuevo!";
+                leerTextoSimple("La balsa se quemó por completo. Puedes volver a intentarlo o volver al menú.");
             }
         }
 
-        function leerSecuencia(secuencia, indice = 0) {
-            if (indice >= secuencia.length) return;
+        /* --- MOTOR DE ANIMACIÓN --- */
+        function animar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = "#e63946";
+            ctx.fillRect(0, 160, canvas.width, 40);
 
-            const paso = secuencia[indice];
-            const elementoHTML = document.getElementById(paso.resaltar);
+            anguloMovimiento += 0.04;
+            let balanceoY = errores >= 4 ? 50 : Math.sin(anguloMovimiento) * 5; 
+            let baseOffsetX = 220;
+            let baseOffsetY = 110 + balanceoY;
 
-            const u = new SpeechSynthesisUtterance(paso.texto);
-            u.lang = 'es-ES';
+            ctx.fillStyle = "#634832"; 
+            if (errores < 1) ctx.fillRect(baseOffsetX, baseOffsetY + 30, 35, 15);
+            if (errores < 2) ctx.fillRect(baseOffsetX + 40, baseOffsetY + 30, 35, 15);
+            if (errores < 3) ctx.fillRect(baseOffsetX + 80, baseOffsetY + 30, 35, 15);
+            if (errores < 4) ctx.fillRect(baseOffsetX + 120, baseOffsetY + 30, 35, 15);
 
-            u.onstart = () => {
-                if (elementoHTML) elementoHTML.classList.add("efecto-hablar");
-            };
+            particulasFuego.forEach(fuego => {
+                ctx.fillStyle = Math.random() > 0.5 ? "#ff5722" : "#ffb703";
+                ctx.font = "22px Arial";
+                ctx.fillText("🔥", fuego.x, fuego.y + balanceoY);
+            });
 
-            u.onend = () => {
-                if (elementoHTML) elementoHTML.classList.remove("efecto-hablar");
-                leerSecuencia(secuencia, indice + 1);
-            };
+            let monoY = errores >= 4 ? 145 : baseOffsetY;
+            let monoX = baseOffsetX + 60;
 
-            window.speechSynthesis.speak(u);
-        }
+            ctx.fillStyle = "#9c6644";
+            ctx.beginPath(); ctx.arc(monoX + 20, monoY, 18, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(monoX + 1, monoY, 6, 0, Math.PI * 2); ctx.arc(monoX + 39, monoY, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#e6ccb2";
+            ctx.beginPath(); ctx.arc(monoX + 20, monoY + 2, 12, 0, Math.PI * 2); ctx.fill();
 
-        function leerTextoSimple(texto) {
-            window.speechSynthesis.cancel();
-            const lectura = new SpeechSynthesisUtterance(texto);
-            lectura.lang = 'es-ES';
-            window.speechSynthesis.speak(lectura);
-        }
-
-        function leerIndicaciones() {
-            window.speechSynthesis.cancel();
-            document.getElementById("num1").classList.remove("efecto-hablar");
-            document.getElementById("num2").classList.remove("efecto-hablar");
-            document.getElementById("destino").classList.remove("efecto-hablar");
-            document.getElementById("contenedor-signos").classList.remove("efecto-hablar");
-
-            if (nivelActual < niveles.length) {
-                leerSecuencia(niveles[nivelActual].audioSecuencia);
+            ctx.fillStyle = "#000";
+            if (errores >= 3) {
+                ctx.font = "bold 12px Arial";
+                ctx.fillText("X", monoX + 10, monoY + 3); ctx.fillText("X", monoX + 22, monoY + 3);
             } else {
-                leerTextoSimple("El juego ha terminado. Presiona el botón para volver al menú de inicio.");
+                ctx.beginPath(); ctx.arc(monoX + 15, monoY, 2, 0, Math.PI * 2); ctx.arc(monoX + 25, monoY, 2, 0, Math.PI * 2); ctx.fill();
             }
+
+            ctx.fillStyle = "#9c6644";
+            ctx.fillRect(monoX + 5, monoY + 18, 30, 20);
+
+            requestAnimationFrame(animar);
         }
 
-        function leerSigno(tipo) {
-            if (tipo === 'mayor') leerTextoSimple("Signo Mayor que");
-            if (tipo === 'menor') leerTextoSimple("Signo Menor que");
+        function leerTextoSimple(t) { 
+            window.speechSynthesis.cancel(); 
+            const u = new SpeechSynthesisUtterance(t); 
+            u.lang = 'es-ES'; 
+            window.speechSynthesis.speak(u); 
         }
 
-        function arrastrar(ev) {
-            ev.dataTransfer.setData("text", ev.target.innerText);
-            leerSigno(ev.target.id);
-        }
-
-        function permitirSoltar(ev) { ev.preventDefault(); }
-
-        function soltarSigno(ev) {
-            ev.preventDefault();
-            const data = ev.dataTransfer.getData("text");
-            ev.target.innerText = data;
-            ev.target.style.backgroundColor = "#e8f5e9";
-            signoSeleccionado = data;
-            leerTextoSimple(data === ">" ? "Colocaste Mayor que" : "Colocaste Menor que");
+        function leerIndicaciones() { 
+            document.getElementById("btn-parlante").classList.remove("parlante-alerta");
+            const datos = niveles[nivelActual];
+            leerTextoSimple(`¡Ayuda al monito! Compara los números de la balsa. A la izquierda tienes ${datos.izq} y a la derecha tienes ${datos.der}. Selecciona el signo correcto.`);
         }
 
         function irAMenu() {
             window.speechSynthesis.cancel();
-            window.location.href = "4basico.html"; 
+            window.location.href = "4basico.html";
         }
 
         window.onload = () => {
-            cargarNivel();
+            cargarNivel(0);
+            animar();
         };
     </script>
 </body>

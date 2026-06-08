@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aula Virtual: Panel de Desafíos Matemáticos</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
@@ -72,7 +73,7 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
         }
 
@@ -87,10 +88,43 @@
             margin-bottom: 15px;
         }
 
+        .cabecera-tarjeta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
         .titulo-juego {
             font-size: 20px;
             color: #004d99;
-            margin: 0 0 10px 0;
+            margin: 0;
+        }
+
+        .btn-audio {
+            background-color: #e0f7fa;
+            border: 2px solid #00bfff;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-audio:hover {
+            background-color: #b2ebf2;
+            transform: scale(1.1);
+        }
+
+        .btn-audio:active {
+            transform: scale(0.95);
         }
 
         .descripcion-juego {
@@ -100,22 +134,11 @@
             flex-grow: 1;
         }
 
-        /* Fila de Controles Inferiores en Tarjeta */
-        .fila-controles {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            margin-top: auto;
-        }
-
-        /* Botón de Jugar */
         .btn-jugar {
             background-color: #00bfff;
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 12px 30px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 25px;
@@ -123,7 +146,7 @@
             text-decoration: none;
             box-shadow: 0 4px #0099cc;
             transition: background-color 0.2s, transform 0.1s;
-            flex-grow: 1;
+            width: 80%;
             text-align: center;
         }
 
@@ -136,32 +159,6 @@
             box-shadow: none;
         }
 
-        /* Botón Parlante por Tarjeta */
-        .btn-tarjeta-parlante {
-            font-size: 28px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 5px;
-            transition: transform 0.2s;
-            user-select: none;
-        }
-        .btn-tarjeta-parlante:hover {
-            transform: scale(1.15);
-        }
-
-        /* Estilo Animación de Pálpito de Voz */
-        @keyframes palpitarTarjeta {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(0, 191, 255, 0.5); }
-            100% { transform: scale(1); }
-        }
-        .efecto-hablar {
-            animation: palpitarTarjeta 1s ease-in-out infinite;
-            border-color: #00bfff !important;
-        }
-
-        /* Botón reiniciar progreso */
         .btn-reiniciar {
             margin-top: 40px;
             background-color: #ff66b3;
@@ -178,89 +175,152 @@
             transform: translateY(2px);
             box-shadow: none;
         }
+
+        /* --- ESTILOS DE LA PANTALLA DE ÉXITO TOTAL --- */
+        #pantalla-completado {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 77, 153, 0.95);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .caja-felicitaciones {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .caja-felicitaciones h2 {
+            color: #4caf50;
+            font-size: 40px;
+            margin-top: 0;
+        }
+
+        .caja-felicitaciones p {
+            font-size: 22px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .insignia-corona {
+            font-size: 80px;
+            margin: 20px 0;
+            animation: flotar 2s ease-in-out infinite;
+        }
+
+        @keyframes flotar {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
     </style>
 </head>
 <body>
 
-    <header>
+    <header id="interfaz-header">
         <h1>🎒 Mi Aula Virtual de Matemáticas 📐</h1>
         <p style="font-size: 18px; color: #555; font-weight: bold;">¡Completa las misiones y junta todas las estrellas posibles!</p>
     </header>
 
-    <div style="text-align: center;">
+    <div id="interfaz-marcador" style="text-align: center;">
         <div class="marcador-global">
             ⭐ <span id="puntaje-total">0</span> Puntos Totales
         </div>
         <div class="rango-medalla" id="rango-texto">Rango: Aprendiz de la Isla 🥚</div>
     </div>
 
-    <div class="contenedor-juegos">
+    <div class="contenedor-juegos" id="interfaz-juegos">
 
-        <div class="tarjeta-juego" id="tarjeta-1">
-            <div class="icono-juego">🦖</div>
-            <h3 class="titulo-juego">Juego 1: Isla Dinosaurio</h3>
-            <p class="descripcion-juego" id="desc-1">Descubre qué criatura es más grande o pequeña contando y comparando los elementos prehistóricos.</p>
-            <div class="fila-controles">
-                <a href="juego.html" class="btn-jugar">¡Jugar Ahora!</a>
-                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(1, 'Juego uno, Isla Dinosaurio. Descubre qué criatura es más grande o pequeña contando y comparando los elementos prehistóricos.')">🔊</button>
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🍩</div>
+            <div class="cabecera-tarjeta">
+                <h3 class="titulo-juego">Juego 1: La cafetería</h3>
+                <button class="btn-audio" onclick="leerDescripcion(this)" title="Escuchar descripción">🔊</button>
             </div>
+            <p class="descripcion-juego">¡El Desafío de los Postres! Ayuda a equilibrar las bandejas mágicas de la cafetería arrastrando los dulces necesarios para cumplir la regla del signo Mayor, Menor o Igual.</p>
+            <a href="juego.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
 
-        <div class="tarjeta-juego" id="tarjeta-2">
-            <div class="icono-juego">🧙‍♂️</div>
-            <h3 class="titulo-juego">Juego 2: El Mago de los Números</h3>
-            <p class="descripcion-juego" id="desc-2">Ayuda al mago a ordenar sus pociones numéricas utilizando las reglas lógicas del tablero.</p>
-            <div class="fila-controles">
-                <a href="juego2.html" class="btn-jugar">¡Jugar Ahora!</a>
-                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(2, 'Juego dos, El Mago de los Números. Ayuda al mago a ordenar sus pociones numéricas utilizando las reglas lógicas del tablero.')">🔊</button>
-            </div>
-        </div>
-
-        <div class="tarjeta-juego" id="tarjeta-3">
+        <div class="tarjeta-juego">
             <div class="icono-juego">🚀</div>
-            <h3 class="titulo-juego">Juego 3: Viaje Espacial</h3>
-            <p class="descripcion-juego" id="desc-3">Pilota tu nave esquivando meteoritos mientras ordenas los bloques espaciales de menor a mayor.</p>
-            <div class="fila-controles">
-                <a href="juego3.html" class="btn-jugar">¡Jugar Ahora!</a>
-                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(3, 'Juego tres, Viaje Espacial. Pilota tu nave esquivando meteoritos mientras ordenas los bloques espaciales de menor a mayor.')">🔊</button>
+            <div class="cabecera-tarjeta">
+                <h3 class="titulo-juego">Juego 2: Viaje Espacial</h3>
+                <button class="btn-audio" onclick="leerDescripcion(this)" title="Escuchar descripción">🔊</button>
             </div>
+            <p class="descripcion-juego">¡Compara la energía de los reactores y salva la nave! Arrastra el signo correcto.</p>
+            <a href="juego2.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
 
-        <div class="tarjeta-juego" id="tarjeta-4">
-            <div class="icono-juego">🏝️</div>
-            <h3 class="titulo-juego">Juego 4: Sobrevive en la Isla</h3>
-            <p class="descripcion-juego" id="desc-4">Arrastra y posiciona los signos correctos de Mayor y Menor para activar los puentes de rescate.</p>
-            <div class="fila-controles">
-                <a href="isladesierta.html" class="btn-jugar">¡Jugar Ahora!</a>
-                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(4, 'Juego cuatro, Sobrevive en la Isla. Arrastra y posiciona los signos correctos de Mayor y Menor para activar los puentes de rescate.')">🔊</button>
-            </div>
-        </div>
-
-        <div class="tarjeta-juego" id="tarjeta-5">
+        <div class="tarjeta-juego">
             <div class="icono-juego">🛒</div>
-            <h3 class="titulo-juego">Juego 5: El Gran Mercado</h3>
-            <p class="descripcion-juego" id="desc-5">Mira los precios de los productos y ordénalos en las balanzas respetando las indicaciones del mostrador.</p>
-            <div class="fila-controles">
-                <a href="tienda5.html" class="btn-jugar">¡Jugar Ahora!</a>
-                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(5, 'Juego cinco, El Gran Mercado. Mira los precios de los productos y ordénalos en las balanzas respetando las indicaciones del mostrador.')">🔊</button>
+            <div class="cabecera-tarjeta">
+                <h3 class="titulo-juego">Juego 3: Tienda</h3>
+                <button class="btn-audio" onclick="leerDescripcion(this)" title="Escuchar descripción">🔊</button>
             </div>
+            <p class="descripcion-juego">¡La Vitrina Loca! Mira los precios de los productos y acomódalos en la balanza para que se cumpla la regla de los signos Mayor o Menor.</p>
+            <a href="juego3.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
 
-        <div class="tarjeta-juego" id="tarjeta-6">
-            <div class="icono-juego">🏷️</div>
-            <h3 class="titulo-juego">Juego 6: Etiquetas Locas</h3>
-            <p class="descripcion-juego" id="desc-6">¡Desafío a contra reloj! Descubre rápidamente si los precios de la tienda dicen la verdad o te engañan.</p>
-            <div class="fila-controles">
-                <a href="tienda6.html" class="btn-jugar">¡Jugar Ahora!</a>
-                <button class="btn-tarjeta-parlante" onclick="leerDescripcion(6, 'Juego seis, Etiquetas Locas. Desafío a contra reloj. Descubre rápidamente si los precios de la tienda dicen la verdad o te engañan.')">🔊</button>
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🐒</div>
+            <div class="cabecera-tarjeta">
+                <h3 class="titulo-juego">Juego 4: Sálvalo de la lava</h3>
+                <button class="btn-audio" onclick="leerDescripcion(this)" title="Escuchar descripción">🔊</button>
             </div>
+            <p class="descripcion-juego">Arrastra y posiciona los signos correctos de Mayor, Menor o Igual para activar los puentes de rescate.</p>
+            <a href="juego4.html" class="btn-jugar">¡Jugar Ahora!</a>
+        </div>
+
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🎈</div>
+            <div class="cabecera-tarjeta">
+                <h3 class="titulo-juego">Juego 5: Revienta globos</h3>
+                <button class="btn-audio" onclick="leerDescripcion(this)" title="Escuchar descripción">🔊</button>
+            </div>
+            <p class="descripcion-juego">¡Prepara tus reflejos y tu supermente matemática! En este emocionante desafío flotante, tu misión es resolver operaciones misteriosas a la velocidad del rayo.</p>
+            <a href="juego5.html" class="btn-jugar">¡Jugar Ahora!</a>
+        </div>
+
+        <div class="tarjeta-juego">
+            <div class="icono-juego">🏷️</div>
+            <div class="cabecera-tarjeta">
+                <h3 class="titulo-juego">Juego 6: Verdadero y falso</h3>
+                <button class="btn-audio" onclick="leerDescripcion(this)" title="Escuchar descripción">🔊</button>
+            </div>
+            <p class="descripcion-juego">¡Desafío a contrarreloj! Descubre rápidamente si los precios de la tienda dicen la verdad o te engañan.</p>
+            <a href="juego6.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
 
     </div>
 
-    <button class="btn-reiniciar" onclick="reiniciarTodoProgreso()">🔄 Reiniciar Todo el Progreso</button>
+    <button id="interfaz-reiniciar" class="btn-reiniciar" onclick="reiniciarTodoProgreso()">🔄 Reiniciar Todo el Progreso</button>
+
+    <div id="pantalla-completado">
+        <div class="caja-felicitaciones">
+            <div class="insignia-corona">👑🔥</div>
+            <h2>¡Felicidades!</h2>
+            <p>¡Has completado todos los niveles con éxito y te has convertido en una Leyenda Matemática!</p>
+            <button class="btn-jugar" style="margin-top: 20px; width: auto;" onclick="cerrarVentanaExito()">Ver mi panel</button>
+        </div>
+    </div>
 
     <script>
+        // Supongamos que el puntaje ideal máximo acumulado esperado es de 240 puntos
+        // (Por ejemplo: 40 puntos por juego x 6 juegos)
+        const PUNTAJE_MAXIMO_REQUERIDO = 240; 
+
         window.onload = function() {
             actualizarInterfazProgreso();
         };
@@ -269,6 +329,7 @@
             let puntos = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
             document.getElementById("puntaje-total").innerText = puntos;
 
+            // Sistema de rangos y medallas motivacionales
             let rangoTexto = document.getElementById("rango-texto");
             if (puntos === 0) {
                 rangoTexto.innerText = "Rango: ¡Listo para empezar el viaje! 🥚";
@@ -281,39 +342,62 @@
             } else {
                 rangoTexto.innerText = "Rango: ¡LEYENDA SUPREMA DE LAS MATEMÁTICAS! 👑🔥";
             }
+
+            // SI ALCANZA O SUPERA EL PUNTAJE MÁXIMO, DISPARA LA PANTALLA DE ÉXITO TOTAL
+            if (puntos >= PUNTAJE_MAXIMO_REQUERIDO) {
+                mostrarPantallaExitoTotal();
+            }
         }
 
-        function limpiarEfectosVisuales() {
-            const tarjetas = document.querySelectorAll('.tarjeta-juego');
-            tarjetas.forEach(t => t.classList.remove('efecto-hablar'));
-        }
+        function mostrarPantallaExitoTotal() {
+            const pantalla = document.getElementById("pantalla-completado");
+            pantalla.style.display = "flex";
 
-        function leerDescripcion(idJuego, textoNavegacion) {
+            // Lanza ráfagas continuas de confeti festivo
+            let duracion = 5 * 1000;
+            let fin = Date.now() + duracion;
+
+            (function lanzarConfeti() {
+                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
+                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
+
+                if (Date.now() < fin) {
+                    requestAnimationFrame(lanzarConfeti);
+                }
+            }());
+
+            // Anuncia el gran logro con audio de forma automática
             window.speechSynthesis.cancel();
-            limpiarEfectosVisuales();
+            let mensajeExito = new SpeechSynthesisUtterance("¡Felicidades! Has completado todos los niveles con éxito.");
+            mensajeExito.lang = 'es-ES';
+            window.speechSynthesis.speak(mensajeExito);
+        }
 
-            const tarjetaObjetivo = document.getElementById(`tarjeta-${idJuego}`);
-            const u = new SpeechSynthesisUtterance(textoNavegacion);
-            u.lang = 'es-ES';
-
-            u.onstart = function() {
-                if (tarjetaObjetivo) tarjetaObjetivo.classList.add('efecto-hablar');
-            };
-
-            u.onend = function() {
-                if (tarjetaObjetivo) tarjetaObjetivo.classList.remove('efecto-hablar');
-            };
-
-            window.speechSynthesis.speak(u);
+        function cerrarVentanaExito() {
+            document.getElementById("pantalla-completado").style.display = "none";
         }
 
         function reiniciarTodoProgreso() {
-            window.speechSynthesis.cancel();
-            limpiarEfectosVisuales();
             if (confirm("¿Estás seguro de que deseas borrar los puntos acumulados y empezar de nuevo?")) {
                 localStorage.setItem("puntajeAcumulado", 0);
                 actualizarInterfazProgreso();
             }
+        }
+
+        function leerDescripcion(boton) {
+            window.speechSynthesis.cancel();
+
+            let tarjeta = boton.closest('.tarjeta-juego');
+            let titulo = tarjeta.querySelector('.titulo-juego').innerText;
+            let descripcion = tarjeta.querySelector('.descripcion-juego').innerText;
+
+            let textoAEscuchar = `${titulo}. ${descripcion}`;
+
+            let mensaje = new SpeechSynthesisUtterance(textoAEscuchar);
+            mensaje.lang = 'es-ES';
+            mensaje.rate = 1.0; 
+
+            window.speechSynthesis.speak(mensaje);
         }
     </script>
 </body>

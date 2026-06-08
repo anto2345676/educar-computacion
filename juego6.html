@@ -11,8 +11,19 @@
         #marcador { position: absolute; top: 20px; right: 20px; background-color: #ff9800; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         #contenedor-tiempo { position: absolute; top: 20px; width: 300px; background-color: #ddd; border-radius: 10px; overflow: hidden; height: 20px; }
         #barra-tiempo { width: 100%; height: 100%; background-color: #e53935; transition: width 1s linear; }
-        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; transition: transform 0.2s; }
-        #btn-parlante:hover { transform: scale(1.1); }
+        
+        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; padding: 5px; transition: transform 0.2s; }
+        
+        /* Animación de alerta llamativa para captar la atención del estudiante */
+        @keyframes parpadeoFuerte {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px #fff); background-color: transparent; }
+            50% { transform: scale(1.25); filter: drop-shadow(0 0 25px #ff9800); background-color: rgba(255, 152, 0, 0.3); border-radius: 50%; }
+            100% { transform: scale(1); filter: drop-shadow(0 0 5px #fff); background-color: transparent; }
+        }
+
+        .parlante-alerta {
+            animation: parpadeoFuerte 0.8s ease-in-out infinite;
+        }
         
         .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 80%; max-width: 600px; box-sizing: border-box; }
         .pantalla-final { display: none; }
@@ -37,7 +48,7 @@
             100% { transform: scale(1); }
         }
         .efecto-hablar {
-            animation: palpitar 0.8s ease-in-out 2;
+            animation: palpitar 0.8s ease-in-out 2 !important;
             border-color: #e65100 !important;
             color: #e65100 !important;
         }
@@ -50,11 +61,10 @@
 </head>
 <body>
 
-    <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
+    <button id="btn-parlante" class="parlante-alerta" onclick="leerIndicaciones()">🔊</button>
     <div id="contenedor-tiempo"><div id="barra-tiempo"></div></div>
     <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <!-- PANTALLA PRINCIPAL DEL JUEGO -->
     <div class="pantalla-juego" id="contenedor-juego">
         <h2 id="titulo-pantalla">Desafío 1</h2>
         <p style="font-size: 18px; color: #666; font-weight: bold;">¿Esta etiqueta de precios dice la verdad o miente?</p>
@@ -73,7 +83,6 @@
         <div id="mensaje"></div>
     </div>
 
-    <!-- PANTALLA FINAL DE RESULTADOS -->
     <div class="pantalla-final" id="contenedor-final">
         <h2 id="titulo-final">Auditoría de Etiquetas Completada</h2>
         <p style="font-size: 20px;">Has analizado la veracidad de todas las expresiones matemáticas de la tienda.</p>
@@ -126,7 +135,7 @@
         let tiempoRestante = 15;
         let temporizador = null;
         let respondido = false;
-        let explicando = false; // Nueva bandera de control
+        let explicando = false;
 
         function obtenerPuntajeGlobal() {
             return parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
@@ -156,10 +165,11 @@
             document.getElementById("barra-tiempo").style.width = "100%";
             document.getElementById("contenedor-tiempo").style.display = "block";
 
-            // Detener cualquier conteo previo mientras se inicia la explicación
+            // Se activa el parpadeo del parlante al cargar un nuevo reto
+            document.getElementById("btn-parlante").classList.add("parlante-alerta");
+
             detenerTemporizador();
             
-            // Lanza la lectura del enunciado inicial
             leerTextoEnunciado(`¿Es verdadero o falso que, ${retos[nivelActual].texto}?`);
             actualizarMarcadorVisual();
         }
@@ -190,7 +200,6 @@
 
         function responder(eleccionUsuario) {
             if (respondido) return;
-            // Detener permanentemente el reloj de este turno
             detenerTemporizador();
             window.speechSynthesis.cancel();
             explicando = false;
@@ -240,6 +249,7 @@
             document.getElementById("contenedor-tiempo").style.display = "none";
             document.getElementById("contenedor-final").style.display = "block";
             document.getElementById("puntos-final").innerText = puntosGanadosEsteJuego;
+            document.getElementById("btn-parlante").classList.remove("parlante-alerta");
 
             const tituloFinal = document.getElementById("titulo-final");
             const mensajeEval = document.getElementById("mensaje-final-evaluacion");
@@ -258,7 +268,6 @@
             }
         }
 
-        // Función para leer el enunciado inicial pausando y reanudando el tiempo
         function leerTextoEnunciado(texto) {
             window.speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(texto);
@@ -277,11 +286,10 @@
             window.speechSynthesis.speak(u);
         }
 
-        // Función para la secuencia de indicaciones extendidas por pasos
         function leerSecuencia(secuencia, indice = 0) {
             if (indice >= secuencia.length) {
                 explicando = false;
-                iniciarTemporizador(); // Reanuda cuando termina toda la secuencia
+                iniciarTemporizador();
                 return;
             }
 
@@ -293,7 +301,7 @@
 
             u.onstart = () => {
                 explicando = true;
-                detenerTemporizador(); // Pausa el reloj mientras habla cada tramo
+                detenerTemporizador();
                 if (elementoHTML) elementoHTML.classList.add("efecto-hablar");
             };
 
@@ -314,6 +322,10 @@
 
         function leerIndicaciones() {
             window.speechSynthesis.cancel();
+            
+            // Remueve la alerta visual en cuanto el alumno decide interactuar con el audio
+            document.getElementById("btn-parlante").classList.remove("parlante-alerta");
+
             document.getElementById("num-izq").classList.remove("efecto-hablar");
             document.getElementById("num-der").classList.remove("efecto-hablar");
             document.getElementById("bloque-decisiones").classList.remove("efecto-hablar");
@@ -325,11 +337,6 @@
             } else {
                 leerTextoSimple("Presiona el botón azul para avanzar al siguiente desafío de etiquetas.");
             }
-        }
-
-        function irAMenu() {
-            window.speechSynthesis.cancel();
-            window.location.href = "4basico.html";
         }
 
         window.onload = () => {

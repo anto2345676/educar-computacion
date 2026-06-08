@@ -9,8 +9,20 @@
         body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #e0f7fa; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
         
         #marcador { position: absolute; top: 20px; right: 20px; background-color: #00acc1; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; }
         
+        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; padding: 5px; transition: all 0.3s; }
+        
+        /* Animación de alerta llamativa para captar la atención del estudiante */
+        @keyframes parpadeoFuerte {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px #fff); background-color: transparent; }
+            50% { transform: scale(1.25); filter: drop-shadow(0 0 25px #00acc1); background-color: rgba(0, 172, 193, 0.3); border-radius: 50%; }
+            100% { transform: scale(1); filter: drop-shadow(0 0 5px #fff); background-color: transparent; }
+        }
+
+        .parlante-alerta {
+            animation: parpadeoFuerte 0.8s ease-in-out infinite;
+        }
+
         .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 35px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); width: 85%; max-width: 700px; box-sizing: border-box; }
         .pantalla-final { display: none; }
         h2 { color: #006064; margin-top: 0; }
@@ -82,41 +94,45 @@
 </head>
 <body>
 
-    <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
+    <button id="btn-parlante" class="parlante-alerta" onclick="leerIndicaciones()">🔊</button>
     <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <div class="pantalla-juego" id="contenedor-juego">
-        <h2 id="titulo-juego">Juego 5: Los Globos Relámpago</h2>
-        <p id="instrucciones-juego" style="font-weight: bold; color: #555;"></p>
-        
-        <div class="panel-operacion">
-            <div class="bloque-num" id="bloque-izq">0</div>
-            <div class="incognita-central" id="bloque-signo">?</div>
-            <div class="bloque-num" id="bloque-der">0</div>
-        </div>
+    <div class="pantaya-juego" id="contenedor-juego" class="pantalla-juego">
+        <div class="pantalla-juego">
+            <h2 id="titulo-juego">Juego 5: Los Globos Relámpago</h2>
+            <p id="instrucciones-juego" style="font-weight: bold; color: #555;"></p>
+            
+            <div class="panel-operacion">
+                <div class="bloque-num" id="bloque-izq">0</div>
+                <div class="incognita-central" id="bloque-signo">?</div>
+                <div class="bloque-num" id="bloque-der">0</div>
+            </div>
 
-        <p style="font-weight: bold; color: #006064;">¡Revienta el globo con la respuesta correcta!</p>
-        <div class="cielo-globos" id="zona-vuelo">
-            <div class="globo" id="globo-mayor" onclick="intentarReviento(this, '>')">&gt;</div>
-            <div class="globo" id="globo-igual" onclick="intentarReviento(this, '=')">=</div>
-            <div class="globo" id="globo-menor" onclick="intentarReviento(this, '<')">&lt;</div>
-        </div>
+            <p style="font-weight: bold; color: #006064;">¡Revienta el globo con la respuesta correcta!</p>
+            <div class="cielo-globos" id="zona-vuelo">
+                <div class="globo" id="globo-mayor" onclick="intentarReviento(this, '>')">&gt;</div>
+                <div class="globo" id="globo-igual" onclick="intentarReviento(this, '=')">=</div>
+                <div class="globo" id="globo-menor" onclick="intentarReviento(this, '<')">&lt;</div>
+            </div>
 
-        <div class="controles">
-            <button class="btn-accion" id="btn-reintentar" onclick="reintentar()">Volver a intentar</button>
-            <button class="btn-accion" id="btn-siguiente" onclick="siguienteNivel()">Siguiente Desafío</button>
+            <div class="controles">
+                <button class="btn-accion" id="btn-reintentar" onclick="reintentar()">Volver a intentar</button>
+                <button class="btn-accion" id="btn-siguiente" onclick="siguienteNivel()">Siguiente Desafío</button>
+            </div>
+            <div id="mensaje"></div>
         </div>
-        <div id="mensaje"></div>
     </div>
 
-    <div class="pantalla-final" id="contenedor-final">
-        <h2>🎈 ¡Festival de Globos Completado! 🎈</h2>
-        <p style="font-size: 20px;">¡Magnífico! Tu agilidad mental matemática resolvió todos los niveles.</p>
-        <div class="resultado-puntos">Ganaste +<span id="puntos-final">0</span> puntos para tu registro</div>
-        <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
-        
-        <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
-            <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
+    <div class="contenedor-isla pantalla-final" id="contenedor-final">
+        <div class="pantalla-final" id="bloque-final-estilo" style="display: block;">
+            <h2>🎈 ¡Festival de Globos Completado! 🎈</h2>
+            <p style="font-size: 20px;">¡Magnífico! Tu agilidad mental matemática resolvió todos los niveles.</p>
+            <div class="resultado-puntos">Ganaste +<span id="puntos-final">0</span> puntos para tu registro</div>
+            <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
+            
+            <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
+                <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
+            </div>
         </div>
     </div>
 
@@ -124,7 +140,7 @@
         const niveles = [
             {
                 titulo: "Juego 5 - Nivel 1: Sumas v/s Precios",
-                instrucciones: "Resuelve mentalmente la operation para saber qué lado es mayor.",
+                instrucciones: "Resuelve mentalmente la operación para saber qué lado es mayor.",
                 audioSecuencia: [
                     { texto: "En el lado izquierdo hay tres mil quinientos pesos.", resaltar: "bloque-izq" },
                     { texto: "En el lado derecho hay una suma de dos mil más mil quinientos pesos.", resaltar: "bloque-der" },
@@ -200,7 +216,6 @@
             document.getElementById("puntos").innerText = obtenerPuntajeGlobal();
         }
 
-        // Sintetizador de sonido pop nativo por código (sin archivos externos)
         function reproducirSonidoPop() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -243,7 +258,9 @@
             document.getElementById("btn-reintentar").style.display = "none";
             document.getElementById("btn-siguiente").style.display = "none";
             
-            // Reestablecer estados y clases de todos los globos
+            // Activamos la animación del parlante al cambiar o reiniciar un nivel
+            document.getElementById("btn-parlante").classList.add("parlante-alerta");
+
             const globos = document.querySelectorAll('.globo');
             globos.forEach(g => {
                 g.classList.remove('reventado');
@@ -259,14 +276,11 @@
             if (juegoBloqueado) return;
             juegoBloqueado = true;
 
-            // Bloquear entrada táctil inmediatamente
             document.getElementById("zona-vuelo").style.pointerEvents = "none";
 
-            // Ejecutar efectos del reventado
             reproducirSonidoPop();
             elementoGlobo.classList.add('reventado');
 
-            // Esperar el final de la animación CSS de expansión (200ms) para procesar la lógica matemática
             setTimeout(() => {
                 procesarRespuesta(signo);
             }, 200);
@@ -312,6 +326,7 @@
             document.getElementById("contenedor-juego").style.display = "none";
             document.getElementById("contenedor-final").style.display = "block";
             document.getElementById("puntos-final").innerText = puntosGanadosEsteJuego;
+            document.getElementById("btn-parlante").classList.remove("parlante-alerta");
 
             const txtEval = document.getElementById("mensaje-final-evaluacion");
             txtEval.innerText = "🏆 ¡Fabuloso! Tus puntos se sumaron correctamente.";
@@ -350,6 +365,10 @@
 
         function leerIndicaciones() {
             window.speechSynthesis.cancel();
+            
+            // Apagamos la alerta visual del botón de audio al ser presionado por el niño
+            document.getElementById("btn-parlante").classList.remove("parlante-alerta");
+
             document.getElementById("bloque-izq").classList.remove("efecto-hablar");
             document.getElementById("bloque-der").classList.remove("efecto-hablar");
             document.getElementById("zona-vuelo").classList.remove("efecto-hablar");
@@ -361,12 +380,8 @@
             }
         }
 
-        function irAMenu() {
-            window.speechSynthesis.cancel();
-            window.location.href = "4basico.html";
-        }
-
         window.onload = () => {
+            document.getElementById("contenedor-final").style.display = "none";
             cargarNivel(0);
         };
     </script>

@@ -8,7 +8,16 @@
     <style>
         body { font-family: 'Arial Rounded MT Bold', Arial, sans-serif; background-color: #e8f5e9; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
         #marcador { position: absolute; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px 20px; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; }
+        
+        /* Botón parlante con animación de pálpito comercial */
+        #btn-parlante { position: absolute; top: 20px; left: 20px; font-size: 40px; cursor: pointer; background: none; border: none; border-radius: 50%; padding: 5px; transition: transform 0.2s ease; }
+        
+        @keyframes pulso-tienda {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(76, 175, 80, 0)); }
+            50% { transform: scale(1.2); filter: drop-shadow(0 0 12px #4caf50); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(76, 175, 80, 0)); }
+        }
+        .parlante-llamativo { animation: pulso-tienda 1.2s infinite ease-in-out; }
         
         .pantalla-juego, .pantalla-final { text-align: center; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 85%; max-width: 700px; }
         .pantalla-final { display: none; }
@@ -34,7 +43,7 @@
         .btn-signo:active { box-shadow: 0 2px #263238; transform: translateY(4px); }
         .btn-signo.seleccionado { background-color: #00c853; box-shadow: 0 6px #00a142; }
 
-        /* Animación de pálpito igual a los juegos 1 y 2 */
+        /* Animación de pálpito de voz */
         @keyframes palpitar {
             0% { transform: scale(1); }
             50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(230, 81, 0, 0.4); }
@@ -51,18 +60,18 @@
         #btn-reintentar { background-color: #e71d36; display: none; }
         #btn-siguiente { background-color: #ff9f1c; display: none; }
         .btn-menu { background-color: #795548; }
-        #mensaje { margin-top: 20px; font-size: 24px; font-weight: bold; }
+        #mensaje { margin-top: 20px; font-size: 24px; font-weight: bold; min-height: 35px; }
         .resultado-puntos { font-size: 32px; color: #2e7d32; margin: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <button id="btn-parlante" onclick="leerIndicaciones()">🔊</button>
+    <button id="btn-parlante" class="parlante-llamativo" onclick="leerIndicaciones()">🔊</button>
     <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
     <div class="pantalla-juego" id="contenedor-juego">
         <h2 id="titulo-juego">Juego 3: El Cajero de los Signos</h2>
-        <p id="instrucciones-juego" style="font-weight: bold; color: #555;"></p>
+        <p id="instrucciones-juego" style="font-weight: bold; color: #555; font-size: 18px;"></p>
         
         <div class="cajero-contenedor">
             <div class="pantalla-producto-izq" id="prod-izquierdo"></div>
@@ -167,6 +176,9 @@
             document.getElementById("pantalla-operador").innerText = "?";
             document.getElementById("mensaje").innerText = "";
 
+            // Activa el pálpito inicial al cargar un nuevo nivel
+            document.getElementById("btn-parlante").classList.add("parlante-llamativo");
+
             document.getElementById("btn-validar").style.display = "inline-block";
             document.getElementById("btn-reintentar").style.display = "none";
             document.getElementById("btn-siguiente").style.display = "none";
@@ -177,8 +189,8 @@
             const divIzq = document.getElementById("prod-izquierdo");
             const divDer = document.getElementById("prod-derecho");
 
-            divIzq.innerHTML = `<div class="icono">${datosNivel.izq.icono}</div><div class="nombre">${datosNivel.izq.nombre}</div><div class="precio">$${datosNivel.izq.precio}</div>`;
-            divDer.innerHTML = `<div class="icono">${datosNivel.der.icono}</div><div class="nombre">${datosNivel.der.nombre}</div><div class="precio">$${datosNivel.der.precio}</div>`;
+            divIzq.innerHTML = `<div class="icono">${datosNivel.izq.icono}</div><div class="nombre">${datosNivel.izq.nombre}</div><div class="precio">$${datosNivel.izq.precio.toLocaleString('es-CL')}</div>`;
+            divDer.innerHTML = `<div class="icono">${datosNivel.der.icono}</div><div class="nombre">${datosNivel.der.nombre}</div><div class="precio">$${datosNivel.der.precio.toLocaleString('es-CL')}</div>`;
 
             actualizarMarcadorVisual();
         }
@@ -186,7 +198,9 @@
         function seleccionarSigno(signo) {
             signoSeleccionado = signo;
             document.getElementById("pantalla-operador").innerText = signo;
-            leerTextoSimple(`Elegiste el signo ${signo === '>' ? 'mayor que' : signo === '<' ? 'menor que' : 'igual a'}`);
+            
+            let textoSigno = signo === '>' ? 'mayor que' : signo === '<' ? 'menor que' : 'igual a';
+            leerTextoSimple(`Elegiste el signo ${textoSigno}`);
 
             const botones = document.querySelectorAll(".btn-signo");
             botones.forEach(b => {
@@ -252,6 +266,7 @@
             document.getElementById("contenedor-juego").style.display = "none";
             document.getElementById("contenedor-final").style.display = "block";
             document.getElementById("puntos-final").innerText = puntosGanadosEsteJuego;
+            document.getElementById("btn-parlante").classList.remove("parlante-llamativo");
 
             const txtEvaluacion = document.getElementById("mensaje-final-evaluacion");
             txtEvaluacion.innerText = "🏆 ¡Fabuloso! Tus puntos se han guardado de forma global.";
@@ -289,6 +304,9 @@
         }
 
         function leerIndicaciones() { 
+            // Apaga el pálpito llamativo automático al hacer clic en él
+            document.getElementById("btn-parlante").classList.remove("parlante-llamativo");
+
             window.speechSynthesis.cancel();
             document.getElementById("prod-izquierdo").classList.remove("efecto-hablar");
             document.getElementById("prod-derecho").classList.remove("efecto-hablar");
