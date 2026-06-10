@@ -159,8 +159,15 @@
             box-shadow: none;
         }
 
-        .btn-reiniciar {
+        .contenedor-botones-inferiores {
+            display: flex;
+            gap: 15px;
             margin-top: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-reiniciar, .btn-inicio {
             background-color: #ff66b3;
             color: white;
             border: none;
@@ -171,59 +178,17 @@
             cursor: pointer;
             box-shadow: 0 4px #e60073;
         }
-        .btn-reiniciar:active {
+        .btn-reiniciar:active, .btn-inicio:active {
             transform: translateY(2px);
             box-shadow: none;
         }
 
-        /* --- ESTILOS DE LA PANTALLA DE ÉXITO TOTAL --- */
-        #pantalla-completado {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 77, 153, 0.95);
-            z-index: 1000;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
+        .btn-inicio {
+            background-color: #4caf50;
+            box-shadow: 0 4px #2e7d32;
         }
-
-        .caja-felicitaciones {
-            background: white;
-            color: #333;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            max-width: 600px;
-            width: 90%;
-        }
-
-        .caja-felicitaciones h2 {
-            color: #4caf50;
-            font-size: 40px;
-            margin-top: 0;
-        }
-
-        .caja-felicitaciones p {
-            font-size: 22px;
-            color: #555;
-            line-height: 1.6;
-        }
-
-        .insignia-corona {
-            font-size: 80px;
-            margin: 20px 0;
-            animation: flotar 2s ease-in-out infinite;
-        }
-
-        @keyframes flotar {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
+        .btn-inicio:hover {
+            background-color: #388e3c;
         }
     </style>
 </head>
@@ -305,21 +270,14 @@
 
     </div>
 
-    <button id="interfaz-reiniciar" class="btn-reiniciar" onclick="reiniciarTodoProgreso()">🔄 Reiniciar Todo el Progreso</button>
-
-    <div id="pantalla-completado">
-        <div class="caja-felicitaciones">
-            <div class="insignia-corona">👑🔥</div>
-            <h2>¡Felicidades!</h2>
-            <p>¡Has completado todos los niveles con éxito y te has convertido en una Leyenda Matemática!</p>
-            <button class="btn-jugar" style="margin-top: 20px; width: auto;" onclick="cerrarVentanaExito()">Ver mi panel</button>
-        </div>
+    <div class="contenedor-botones-inferiores">
+        <button id="interfaz-reiniciar" class="btn-reiniciar" onclick="reiniciarTodoProgreso()">🔄 Reiniciar Todo el Progreso</button>
+        <button class="btn-inicio" onclick="window.location.href='inicio.html'">🏠 Volver a Inicio</button>
     </div>
 
     <script>
-        // Supongamos que el puntaje ideal máximo acumulado esperado es de 240 puntos
-        // (Por ejemplo: 40 puntos por juego x 6 juegos)
-        const PUNTAJE_MAXIMO_REQUERIDO = 240; 
+        // AHORA SE ABRIRÁ AL LLEGAR A 210 PUNTOS
+        const PUNTAJE_MAXIMO_REQUERIDO = 210; 
 
         window.onload = function() {
             actualizarInterfazProgreso();
@@ -343,38 +301,11 @@
                 rangoTexto.innerText = "Rango: ¡LEYENDA SUPREMA DE LAS MATEMÁTICAS! 👑🔥";
             }
 
-            // SI ALCANZA O SUPERA EL PUNTAJE MÁXIMO, DISPARA LA PANTALLA DE ÉXITO TOTAL
+            // SI ALCANZA O SUPERA LOS 210 PUNTOS, ABRE NUEVA VENTANA DE FELICITACIÓN
             if (puntos >= PUNTAJE_MAXIMO_REQUERIDO) {
-                mostrarPantallaExitoTotal();
+                // Pasamos el puntaje por URL a la página final
+                window.open(`final.html?puntos=${puntos}`, "_blank", "width=600,height=700,scrollbars=no,location=no,menubar=no,status=no,toolbar=no");
             }
-        }
-
-        function mostrarPantallaExitoTotal() {
-            const pantalla = document.getElementById("pantalla-completado");
-            pantalla.style.display = "flex";
-
-            // Lanza ráfagas continuas de confeti festivo
-            let duracion = 5 * 1000;
-            let fin = Date.now() + duracion;
-
-            (function lanzarConfeti() {
-                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
-                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
-
-                if (Date.now() < fin) {
-                    requestAnimationFrame(lanzarConfeti);
-                }
-            }());
-
-            // Anuncia el gran logro con audio de forma automática
-            window.speechSynthesis.cancel();
-            let mensajeExito = new SpeechSynthesisUtterance("¡Felicidades! Has completado todos los niveles con éxito.");
-            mensajeExito.lang = 'es-ES';
-            window.speechSynthesis.speak(mensajeExito);
-        }
-
-        function cerrarVentanaExito() {
-            document.getElementById("pantalla-completado").style.display = "none";
         }
 
         function reiniciarTodoProgreso() {

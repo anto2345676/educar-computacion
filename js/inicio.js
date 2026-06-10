@@ -25,16 +25,16 @@ window.addEventListener("DOMContentLoaded", () => {
 function mensajeVoz() {
     window.speechSynthesis.cancel(); // Detener cualquier residuo de voz
     
-    let texto = "¡Excelente! Continuemos con las actividades";
+    let texto = "¡Excelente! Continuemos con todas las actividades";
     let hablar = new SpeechSynthesisUtterance(texto);
     hablar.lang = "es-ES"; 
     hablar.volume = 1;      
     hablar.rate = 1;       
     hablar.pitch = 1.2;   
 
-    // SÓLO cuando termine de hablar la frase del botón "Seguir", cambiará a aprende.html
+    // Cambia a la página todos.html cuando termine de hablar
     hablar.onend = function() {
-        window.location.href = "aprende.html"; 
+        window.location.href = "todos.html"; 
     };
 
     window.speechSynthesis.speak(hablar);

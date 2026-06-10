@@ -2,157 +2,134 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Felicitaciones!</title>
+    <title>¡Felicidades! 🎉</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            background: linear-gradient(135deg, #4caf50, #2196f3);
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            text-align: center;
+            color: white;
             overflow: hidden;
         }
-
-        .pantalla-final {
-            text-align: center;
+        .caja-principal {
             background: white;
-            padding: 50px;
+            color: #333;
+            padding: 50px 40px;
             border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-            max-width: 600px;
-            width: 85%;
-            animation: aparecer 0.8s ease-out;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
         }
-
-        h1 {
-            color: #7209b7;
-            font-size: 38px;
-            margin-top: 20px;
-            margin-bottom: 10px;
+        .insignia-corona {
+            font-size: 90px;
+            margin: 0 0 20px 0;
+            animation: flotar 2s ease-in-out infinite;
         }
-
-        .puntaje-final {
-            font-size: 28px;
-            color: #2e7d32;
-            font-weight: bold;
+        h2 {
+            color: #4caf50;
+            font-size: 42px;
+            margin: 0 0 20px 0;
+        }
+        p {
+            font-size: 22px;
+            line-height: 1.6;
             margin-bottom: 30px;
+            color: #555;
         }
-
-        /* Animación de las Tres Estrellas Requeridas ⭐⭐⭐ */
-        .contenedor-estrellas {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .estrella {
-            font-size: 70px;
-            animation: brincar 1.2s infinite ease-in-out;
-            display: inline-block;
-        }
-        .estrella:nth-child(2) { animation-delay: 0.2s; }
-        .estrella:nth-child(3) { animation-delay: 0.4s; }
-
-        .btn-reiniciar {
-            background-color: #7209b7;
+        .btn-volver {
+            background-color: #2196f3;
             color: white;
             border: none;
-            padding: 15px 35px;
-            font-size: 22px;
+            padding: 14px 35px;
+            font-size: 18px;
             font-weight: bold;
-            border-radius: 15px;
+            border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 5px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
+            box-shadow: 0 5px #1976d2;
+            transition: all 0.2s;
         }
-        .btn-reiniciar:active {
-            transform: translateY(5px);
+        .btn-volver:hover {
+            background-color: #1976d2;
+        }
+        .btn-volver:active {
+            transform: translateY(3px);
             box-shadow: none;
         }
-
-        /* Animaciones visuales */
-        @keyframes aparecer {
-            from { transform: scale(0.7); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        @keyframes flotar {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
         }
-
-        @keyframes brincar {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-25px) scale(1.15); }
+        #confeti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-
-    <div class="pantalla-final">
-        <div class="contenedor-estrellas">
-            <span class="estrella">⭐</span>
-            <span class="estrella">⭐</span>
-            <span class="estrella">⭐</span>
-        </div>
-
-        <h1>¡Felicitaciones, completaste todos los juegos!</h1>
-        <div class="puntaje-final">Lograste un total de: <span id="total-puntos">0</span> puntos</div>
-
-        <button class="btn-reiniciar" onclick="volverAEmpezar()">Volver al Inicio 🏠</button>
+    <canvas id="confeti"></canvas>
+    <div class="caja-principal">
+        <div class="insignia-corona">👑🔥</div>
+        <h2>¡Lo Lograste!</h2>
+        <p>¡Felicidades, has terminado todos los juegos con éxito!<br>
+        Tu puntaje total es de <strong style="color:#f57f17; font-size:26px;" id="puntos-mostrar">0</strong> puntos<br>
+        Eres una verdadera Leyenda de las Matemáticas 🏆</p>
+        <button class="btn-volver" onclick="window.close()">🔄 Volver al Panel</button>
     </div>
 
     <script>
-        // Obtener el registro acumulado total de todos los juegos pasados
-        const puntosFinales = localStorage.getItem("puntajeAcumulado") || "0";
-        document.getElementById("total-puntos").innerText = puntosFinales;
+        // Obtener el puntaje enviado desde la página principal
+        const parametros = new URLSearchParams(window.location.search);
+        const puntosObtenidos = parametros.get('puntos') || 0;
+        document.getElementById('puntos-mostrar').textContent = puntosObtenidos;
 
-        // Ejecutar efectos automáticos al cargar la página final
-        window.onload = () => {
-            lanzarGranConfeti();
-            reproducirLogroAudio();
-        };
+        // Efecto de confeti
+        let duracion = 6 * 1000;
+        let fin = Date.now() + duracion;
+        let canvas = document.getElementById('confeti');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-        // Parte 5: Efecto visual masivo de confeti continuo
-        function lanzarGranConfeti() {
-            let duracion = 4 * 1000;
-            let fin = Date.now() + duracion;
+        (function lanzarConfeti() {
+            confetti({
+                particleCount: 6,
+                angle: 60,
+                spread: 60,
+                origin: { x: 0, y: 0.6 },
+                colors: ['#ffd700', '#ff5722', '#2196f3', '#4caf50', '#e91e63']
+            });
+            confetti({
+                particleCount: 6,
+                angle: 120,
+                spread: 60,
+                origin: { x: 1, y: 0.6 },
+                colors: ['#ffd700', '#ff5722', '#2196f3', '#4caf50', '#e91e63']
+            });
+            if (Date.now() < fin) requestAnimationFrame(lanzarConfeti);
+        }());
 
-            (function frame() {
-                confetti({
-                    particleCount: 4,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0 }
-                });
-                confetti({
-                    particleCount: 4,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 1 }
-                });
-
-                if (Date.now() < fin) {
-                    requestAnimationFrame(frame);
-                }
-            }());
-        }
-
-        // Parte 5: Audio automático de logro o celebración
-        function reproducirLogroAudio() {
-            window.speechSynthesis.cancel();
-            const mensaje = new SpeechSynthesisUtterance("¡Excelente trabajo! Felicitaciones, completaste todos los juegos con éxito. ¡Eres un experto!");
-            mensaje.lang = 'es-ES';
-            window.speechSynthesis.speak(mensaje);
-        }
-
-        // Reinicia el puntaje y regresa a la página inicial de aprendizaje
-        function volverAEmpezar() {
-            window.speechSynthesis.cancel();
-            localStorage.setItem("puntajeAcumulado", "0"); // Resetea la puntuación a cero
-            window.location.href = "basico4.html"; // Cambia esto al nombre exacto de tu primera página si es diferente
-        }
+        // Mensaje de voz
+        window.speechSynthesis.cancel();
+        let mensaje = new SpeechSynthesisUtterance(
+            `¡Felicidades! Has completado todos los juegos con éxito. Tu puntaje total es de ${puntosObtenidos} puntos. ¡Eres una leyenda de las matemáticas, muy bien hecho!`
+        );
+        mensaje.lang = 'es-ES';
+        mensaje.rate = 1.05;
+        window.speechSynthesis.speak(mensaje);
     </script>
 </body>
 </html>

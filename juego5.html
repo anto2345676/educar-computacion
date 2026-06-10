@@ -97,42 +97,38 @@
     <button id="btn-parlante" class="parlante-alerta" onclick="leerIndicaciones()">🔊</button>
     <div id="marcador">⭐ Puntos: <span id="puntos">0</span></div>
 
-    <div class="pantaya-juego" id="contenedor-juego" class="pantalla-juego">
-        <div class="pantalla-juego">
-            <h2 id="titulo-juego">Juego 5: Los Globos Relámpago</h2>
-            <p id="instrucciones-juego" style="font-weight: bold; color: #555;"></p>
-            
-            <div class="panel-operacion">
-                <div class="bloque-num" id="bloque-izq">0</div>
-                <div class="incognita-central" id="bloque-signo">?</div>
-                <div class="bloque-num" id="bloque-der">0</div>
-            </div>
-
-            <p style="font-weight: bold; color: #006064;">¡Revienta el globo con la respuesta correcta!</p>
-            <div class="cielo-globos" id="zona-vuelo">
-                <div class="globo" id="globo-mayor" onclick="intentarReviento(this, '>')">&gt;</div>
-                <div class="globo" id="globo-igual" onclick="intentarReviento(this, '=')">=</div>
-                <div class="globo" id="globo-menor" onclick="intentarReviento(this, '<')">&lt;</div>
-            </div>
-
-            <div class="controles">
-                <button class="btn-accion" id="btn-reintentar" onclick="reintentar()">Volver a intentar</button>
-                <button class="btn-accion" id="btn-siguiente" onclick="siguienteNivel()">Siguiente Desafío</button>
-            </div>
-            <div id="mensaje"></div>
+    <div id="contenedor-juego" class="pantalla-juego">
+        <h2 id="titulo-juego">Juego 5: Los Globos Relámpago</h2>
+        <p id="instrucciones-juego" style="font-weight: bold; color: #555;"></p>
+        
+        <div class="panel-operacion">
+            <div class="bloque-num" id="bloque-izq">0</div>
+            <div class="incognita-central" id="bloque-signo">?</div>
+            <div class="bloque-num" id="bloque-der">0</div>
         </div>
+
+        <p style="font-weight: bold; color: #006064;">¡Revienta el globo con la respuesta correcta!</p>
+        <div class="cielo-globos" id="zona-vuelo">
+            <div class="globo" id="globo-mayor" onclick="intentarReviento(this, '>')">&gt;</div>
+            <div class="globo" id="globo-igual" onclick="intentarReviento(this, '=')">=</div>
+            <div class="globo" id="globo-menor" onclick="intentarReviento(this, '<')">&lt;</div>
+        </div>
+
+        <div class="controles">
+            <button class="btn-accion" id="btn-reintentar" onclick="reintentar()">Volver a intentar</button>
+            <button class="btn-accion" id="btn-siguiente" onclick="siguienteNivel()">Siguiente Desafío</button>
+        </div>
+        <div id="mensaje"></div>
     </div>
 
-    <div class="contenedor-isla pantalla-final" id="contenedor-final">
-        <div class="pantalla-final" id="bloque-final-estilo" style="display: block;">
-            <h2>🎈 ¡Festival de Globos Completado! 🎈</h2>
-            <p style="font-size: 20px;">¡Magnífico! Tu agilidad mental matemática resolvió todos los niveles.</p>
-            <div class="resultado-puntos">Ganaste +<span id="puntos-final">0</span> puntos para tu registro</div>
-            <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
-            
-            <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
-                <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
-            </div>
+    <div class="pantalla-final" id="contenedor-final">
+        <h2>🎈 ¡Festival de Globos Completado! 🎈</h2>
+        <p style="font-size: 20px;">¡Magnífico! Tu agilidad mental matemática resolvió todos los niveles.</p>
+        <div class="resultado-puntos">Ganaste +<span id="puntos-final">0</span> puntos para tu registro</div>
+        <p id="mensaje-final-evaluacion" style="font-size: 22px; font-weight: bold;"></p>
+        
+        <div class="controles" style="margin-top: 30px; flex-direction: column; gap: 15px;">
+            <button class="btn-accion btn-menu" onclick="irAMenu()">🏠 Volver al menú de 4° Básico</button>
         </div>
     </div>
 
@@ -378,6 +374,11 @@
             } else {
                 leerTextoSimple("Fin de la partida. Regresa al menú usando el botón marrón.");
             }
+        }
+
+        // Función agregada para volver al menú principal
+        function irAMenu() {
+            window.location.href = "4basico.html";
         }
 
         window.onload = () => {
