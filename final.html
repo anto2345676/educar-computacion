@@ -21,7 +21,7 @@
         .caja-principal {
             background: white;
             color: #333;
-            padding: 50px 40px;
+            padding: 40px 40px;
             border-radius: 30px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             max-width: 500px;
@@ -30,10 +30,27 @@
             z-index: 10;
         }
         .insignia-corona {
-            font-size: 90px;
-            margin: 0 0 20px 0;
+            font-size: 70px;
+            margin: 0;
             animation: flotar 2s ease-in-out infinite;
         }
+        /* Contenedor y animación de las 3 estrellas */
+        .estrellas-contenedor {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 10px 0 20px 0;
+        }
+        .estrella {
+            font-size: 45px;
+            color: #ffd700;
+            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
+            animation: brillar 1.5s ease-in-out infinite alternate;
+        }
+        .estrella:nth-child(1) { animation-delay: 0s; }
+        .estrella:nth-child(2) { animation-delay: 0.3s; font-size: 55px; transform: translateY(-5px); } /* Estrella del centro más grande */
+        .estrella:nth-child(3) { animation-delay: 0.6s; }
+
         h2 {
             color: #4caf50;
             font-size: 42px;
@@ -66,8 +83,12 @@
         }
         @keyframes flotar {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
+            50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
+        }
+        @keyframes brillar {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px #ffd700); }
         }
         #confeti {
             position: absolute;
@@ -84,6 +105,13 @@
     <canvas id="confeti"></canvas>
     <div class="caja-principal">
         <div class="insignia-corona">👑🔥</div>
+        
+        <div class="estrellas-contenedor">
+            <span class="estrella">⭐</span>
+            <span class="estrella">⭐</span>
+            <span class="estrella">⭐</span>
+        </div>
+
         <h2>¡Lo Lograste!</h2>
         <p>¡Felicidades, has terminado todos los juegos con éxito!<br>
         Tu puntaje total es de <strong style="color:#f57f17; font-size:26px;" id="puntos-mostrar">0</strong> puntos<br>

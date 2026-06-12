@@ -6,6 +6,7 @@
     <title>Aula Virtual: Panel de Desafíos Matemáticos</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        /* --- ESTILOS GENERALES Y PANEL DE JUEGOS --- */
         body {
             font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
             background: linear-gradient(to bottom, #7de3ff, #ffffff);
@@ -15,6 +16,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow-x: hidden;
         }
 
         header {
@@ -29,7 +31,6 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Marcador Global Superior */
         .marcador-global {
             background-color: #fff9c4;
             color: #f57f17;
@@ -52,7 +53,6 @@
             margin-top: 5px;
         }
 
-        /* Contenedor de la Lista de Juegos */
         .contenedor-juegos {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -62,7 +62,6 @@
             padding: 10px;
         }
 
-        /* Tarjeta de cada Juego */
         .tarjeta-juego {
             background: white;
             border-radius: 20px;
@@ -75,6 +74,12 @@
             text-align: center;
             transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
+        }
+
+        /* Alerta animada para el juego sugerido */
+        .tarjeta-juego.sugerido {
+            border: 4px dashed #ff5722;
+            animation: parpadeoAlerta 1.5s infinite alternate;
         }
 
         .tarjeta-juego:hover {
@@ -123,10 +128,6 @@
             transform: scale(1.1);
         }
 
-        .btn-audio:active {
-            transform: scale(0.95);
-        }
-
         .descripcion-juego {
             font-size: 14px;
             color: #666;
@@ -150,14 +151,8 @@
             text-align: center;
         }
 
-        .btn-jugar:hover {
-            background-color: #0099cc;
-        }
-
-        .btn-jugar:active {
-            transform: translateY(2px);
-            box-shadow: none;
-        }
+        .btn-jugar:hover { background-color: #0099cc; }
+        .btn-jugar:active { transform: translateY(2px); box-shadow: none; }
 
         .contenedor-botones-inferiores {
             display: flex;
@@ -178,17 +173,113 @@
             cursor: pointer;
             box-shadow: 0 4px #e60073;
         }
-        .btn-reiniciar:active, .btn-inicio:active {
-            transform: translateY(2px);
-            box-shadow: none;
+        .btn-reiniciar:active, .btn-inicio:active { transform: translateY(2px); box-shadow: none; }
+        .btn-inicio { background-color: #4caf50; box-shadow: 0 4px #2e7d32; }
+        .btn-inicio:hover { background-color: #388e3c; }
+
+        /* --- PANTALLA FINAL DE FELICITACIÓN --- */
+        #pantalla-final {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #4caf50, #2196f3);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
         }
 
-        .btn-inicio {
-            background-color: #4caf50;
-            box-shadow: 0 4px #2e7d32;
+        .caja-principal {
+            background: white;
+            color: #333;
+            padding: 40px 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            z-index: 10000;
         }
-        .btn-inicio:hover {
-            background-color: #388e3c;
+
+        .insignia-corona {
+            font-size: 70px;
+            margin: 0;
+            animation: flotar 2s ease-in-out infinite;
+        }
+
+        .estrellas-contenedor {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 10px 0 20px 0;
+        }
+
+        .estrella {
+            font-size: 45px;
+            color: #ffd700;
+            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
+            animation: brillar 1.5s ease-in-out infinite alternate;
+        }
+        .estrella:nth-child(1) { animation-delay: 0s; }
+        .estrella:nth-child(2) { animation-delay: 0.3s; font-size: 55px; transform: translateY(-5px); }
+        .estrella:nth-child(3) { animation-delay: 0.6s; }
+
+        .caja-principal h2 {
+            color: #4caf50;
+            font-size: 42px;
+            margin: 0 0 20px 0;
+        }
+
+        .caja-principal p {
+            font-size: 22px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        .btn-volver {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px #1976d2;
+            transition: all 0.2s;
+        }
+        .btn-volver:hover { background-color: #1976d2; }
+        .btn-volver:active { transform: translateY(3px); box-shadow: none; }
+
+        @keyframes flotar {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes brillar {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px #ffd700); }
+        }
+
+        @keyframes parpadeoAlerta {
+            0% { border-color: #ff5722; box-shadow: 0 0 10px rgba(255,87,34,0.2); }
+            100% { border-color: #ffeb3b; box-shadow: 0 0 20px rgba(255,235,59,0.6); }
+        }
+
+        #confeti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -207,8 +298,7 @@
     </div>
 
     <div class="contenedor-juegos" id="interfaz-juegos">
-
-        <div class="tarjeta-juego">
+        <div class="tarjeta-juego" id="juego-1">
             <div class="icono-juego">🍩</div>
             <div class="cabecera-tarjeta">
                 <h3 class="titulo-juego">Juego 1: La cafetería</h3>
@@ -218,7 +308,7 @@
             <a href="juego.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
 
-        <div class="tarjeta-juego">
+        <div class="tarjeta-juego" id="juego-2">
             <div class="icono-juego">🚀</div>
             <div class="cabecera-tarjeta">
                 <h3 class="titulo-juego">Juego 2: Viaje Espacial</h3>
@@ -228,7 +318,7 @@
             <a href="juego2.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
 
-        <div class="tarjeta-juego">
+        <div class="tarjeta-juego" id="juego-3">
             <div class="icono-juego">🛒</div>
             <div class="cabecera-tarjeta">
                 <h3 class="titulo-juego">Juego 3: Tienda</h3>
@@ -238,7 +328,7 @@
             <a href="juego3.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
 
-        <div class="tarjeta-juego">
+        <div class="tarjeta-juego" id="juego-4">
             <div class="icono-juego">🐒</div>
             <div class="cabecera-tarjeta">
                 <h3 class="titulo-juego">Juego 4: Sálvalo de la lava</h3>
@@ -248,7 +338,7 @@
             <a href="juego4.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
 
-        <div class="tarjeta-juego">
+        <div class="tarjeta-juego" id="juego-5">
             <div class="icono-juego">🎈</div>
             <div class="cabecera-tarjeta">
                 <h3 class="titulo-juego">Juego 5: Revienta globos</h3>
@@ -258,7 +348,7 @@
             <a href="juego5.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
 
-        <div class="tarjeta-juego">
+        <div class="tarjeta-juego" id="juego-6">
             <div class="icono-juego">🏷️</div>
             <div class="cabecera-tarjeta">
                 <h3 class="titulo-juego">Juego 6: Verdadero y falso</h3>
@@ -267,27 +357,67 @@
             <p class="descripcion-juego">¡Desafío a contrarreloj! Descubre rápidamente si los precios de la tienda dicen la verdad o te engañan.</p>
             <a href="juego6.html" class="btn-jugar">¡Jugar Ahora!</a>
         </div>
-
     </div>
 
-    <div class="contenedor-botones-inferiores">
+    <div class="contenedor-botones-inferiores" id="interfaz-botones">
         <button id="interfaz-reiniciar" class="btn-reiniciar" onclick="reiniciarTodoProgreso()">🔄 Reiniciar Todo el Progreso</button>
         <button class="btn-inicio" onclick="window.location.href='inicio.html'">🏠 Volver a Inicio</button>
     </div>
 
+
+    <div id="pantalla-final">
+        <canvas id="confeti"></canvas>
+        <div class="caja-principal">
+            <div class="insignia-corona">👑🔥</div>
+            
+            <div class="estrellas-contenedor">
+                <span class="estrella">⭐</span>
+                <span class="estrella">⭐</span>
+                <span class="estrella">⭐</span>
+            </div>
+
+            <h2>¡Lo Lograste!</h2>
+            <p>¡Felicidades, has terminado todos los juegos con éxito!<br>
+            Tu puntaje total es de <strong style="color:#f57f17; font-size:26px;" id="puntos-mostrar">0</strong> puntos<br>
+            Eres una verdadera Leyenda de las Matemáticas 🏆</p>
+            <button class="btn-volver" onclick="ocultarFelicitacion()">🔄 Volver al Panel</button>
+        </div>
+    </div>
+
+
     <script>
-        // AHORA SE ABRIRÁ AL LLEGAR A 210 PUNTOS
         const PUNTAJE_MAXIMO_REQUERIDO = 210; 
+        let intervaloConfeti;
 
         window.onload = function() {
             actualizarInterfazProgreso();
         };
 
         function actualizarInterfazProgreso() {
-            let puntos = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+            // Lectura de puntos individuales del localStorage
+            let j1 = parseInt(localStorage.getItem("juego1_puntos")) || 0;
+            let j2 = parseInt(localStorage.getItem("juego2_puntos")) || 0;
+            let j3 = parseInt(localStorage.getItem("juego3_puntos")) || 0;
+            let j4 = parseInt(localStorage.getItem("juego4_puntos")) || 0;
+            let j5 = parseInt(localStorage.getItem("juego5_puntos")) || 0;
+            let j6 = parseInt(localStorage.getItem("juego6_puntos")) || 0;
+
+            // Sumamos los puntajes individuales
+            let puntosSeparados = j1 + j2 + j3 + j4 + j5 + j6;
+            
+            // También leemos "puntajeAcumulado" por si tus juegos viejos siguen usando esa variable exacta
+            let puntosDirectos = parseInt(localStorage.getItem("puntajeAcumulado")) || 0;
+            
+            // Elegimos el valor más alto para que NUNCA marque cero en el total
+            let puntos = Math.max(puntosSeparados, puntosDirectos);
+            
+            // CORREGIDO: Ahora muestra el puntaje real correctamente en pantalla
             document.getElementById("puntaje-total").innerText = puntos;
 
-            // Sistema de rangos y medallas motivacionales
+            // Limpiar estados de alerta previos en la interfaz gráfica
+            document.querySelectorAll('.tarjeta-juego').forEach(t => t.classList.remove('sugerido'));
+
+            // Control de rangos motivacionales
             let rangoTexto = document.getElementById("rango-texto");
             if (puntos === 0) {
                 rangoTexto.innerText = "Rango: ¡Listo para empezar el viaje! 🥚";
@@ -301,15 +431,110 @@
                 rangoTexto.innerText = "Rango: ¡LEYENDA SUPREMA DE LAS MATEMÁTICAS! 👑🔥";
             }
 
-            // SI ALCANZA O SUPERA LOS 210 PUNTOS, ABRE NUEVA VENTANA DE FELICITACIÓN
+            // EVALUACIÓN DE CONDICIÓN FINAL
             if (puntos >= PUNTAJE_MAXIMO_REQUERIDO) {
-                // Pasamos el puntaje por URL a la página final
-                window.open(`final.html?puntos=${puntos}`, "_blank", "width=600,height=700,scrollbars=no,location=no,menubar=no,status=no,toolbar=no");
+                mostrarFelicitacion(puntos);
+            } else {
+                // Si le faltan puntos, analiza cuál juego necesita completar
+                analizarPuntajeBajo(j1, j2, j3, j4, j5, j6, puntos);
             }
+        }
+
+        function analizarPuntajeBajo(j1, j2, j3, j4, j5, j6, total) {
+            // Solo se activa el aviso si el usuario ya empezó a jugar y tiene puntos
+            if (total > 0) {
+                let juegos = [
+                    { id: "juego-1", nombre: "Juego 1: La cafetería", puntos: j1, maximo: 30 },
+                    { id: "juego-2", nombre: "Juego 2: Viaje Espacial", puntos: j2, maximo: 30 },
+                    { id: "juego-3", nombre: "Juego 3: Tienda", puntos: j3, maximo: 30 },
+                    { id: "juego-4", nombre: "Juego 4: Sálvalo de la lava", puntos: j4, maximo: 40 },
+                    { id: "juego-5", nombre: "Juego 5: Revienta globos", puntos: j5, maximo: 40 },
+                    { id: "juego-6", nombre: "Juego 6: Verdadero y falso", puntos: j6, maximo: 40 }
+                ];
+
+                // Filtramos los juegos en los que NO se ha sacado el puntaje máximo perfecto
+                let juegosIncompletos = juegos.filter(j => j.puntos < j.maximo);
+
+                if (juegosIncompletos.length > 0) {
+                    // Encontramos cuál es el desafío donde se perdieron más puntos
+                    let peorJuego = juegosIncompletos.reduce((peor, actual) => {
+                        let faltaPeor = peor.maximo - peor.puntos;
+                        let faltaActual = actual.maximo - actual.puntos;
+                        return faltaActual > faltaPeor ? actual : peor;
+                    }, juegosIncompletos[0]);
+
+                    // Marcamos visualmente la tarjeta de la sugerencia (Borde parpadeante)
+                    let tarjetaSugerida = document.getElementById(peorJuego.id);
+                    if (tarjetaSugerida) {
+                        tarjetaSugerida.classList.add('sugerido');
+                    }
+
+                    // CORREGIDO: Mensaje de audio guiado indicando qué juego completar
+                    window.speechSynthesis.cancel();
+                    let avisoVoz = new SpeechSynthesisUtterance(
+                        `¡Ya casi lo logras! Tienes ${total} puntos en total, pero necesitas llegar a 210 para ganar la corona. Te sugiero volver a intentar el ${peorJuego.nombre} para conseguir todos los puntos que te faltan. ¡Tú puedes!`
+                    );
+                    avisoVoz.lang = 'es-ES';
+                    avisoVoz.rate = 1.0;
+                    window.speechSynthesis.speak(avisoVoz);
+                }
+            }
+        }
+
+        function mostrarFelicitacion(puntos) {
+            document.getElementById('puntos-mostrar').textContent = puntos;
+            const pantallaFinal = document.getElementById('pantalla-final');
+            pantallaFinal.style.display = 'flex';
+
+            let duracion = 6 * 1000;
+            let fin = Date.now() + duracion;
+            let canvas = document.getElementById('confeti');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            (function lanzarConfeti() {
+                confetti({
+                    particleCount: 6,
+                    angle: 60,
+                    spread: 60,
+                    origin: { x: 0, y: 0.6 },
+                    colors: ['#ffd700', '#ff5722', '#2196f3', '#4caf50', '#e91e63']
+                });
+                confetti({
+                    particleCount: 6,
+                    angle: 120,
+                    spread: 60,
+                    origin: { x: 1, y: 0.6 },
+                    colors: ['#ffd700', '#ff5722', '#2196f3', '#4caf50', '#e91e63']
+                });
+                if (Date.now() < fin) {
+                    intervaloConfeti = requestAnimationFrame(lanzarConfeti);
+                }
+            }());
+
+            window.speechSynthesis.cancel();
+            let mensaje = new SpeechSynthesisUtterance(
+                `¡Felicidades! Has completado todos los juegos con éxito. Tu puntaje total es de ${puntos} puntos. ¡Eres una leyenda de las matemáticas, muy bien hecho!`
+            );
+            mensaje.lang = 'es-ES';
+            mensaje.rate = 1.05;
+            window.speechSynthesis.speak(mensaje);
+        }
+
+        function ocultarFelicitacion() {
+            document.getElementById('pantalla-final').style.display = 'none';
+            cancelAnimationFrame(intervaloConfeti);
+            window.speechSynthesis.cancel();
         }
 
         function reiniciarTodoProgreso() {
             if (confirm("¿Estás seguro de que deseas borrar los puntos acumulados y empezar de nuevo?")) {
+                localStorage.setItem("juego1_puntos", 0);
+                localStorage.setItem("juego2_puntos", 0);
+                localStorage.setItem("juego3_puntos", 0);
+                localStorage.setItem("juego4_puntos", 0);
+                localStorage.setItem("juego5_puntos", 0);
+                localStorage.setItem("juego6_puntos", 0);
                 localStorage.setItem("puntajeAcumulado", 0);
                 actualizarInterfazProgreso();
             }
@@ -317,17 +542,14 @@
 
         function leerDescripcion(boton) {
             window.speechSynthesis.cancel();
-
             let tarjeta = boton.closest('.tarjeta-juego');
             let titulo = tarjeta.querySelector('.titulo-juego').innerText;
             let descripcion = tarjeta.querySelector('.descripcion-juego').innerText;
 
             let textoAEscuchar = `${titulo}. ${descripcion}`;
-
             let mensaje = new SpeechSynthesisUtterance(textoAEscuchar);
             mensaje.lang = 'es-ES';
             mensaje.rate = 1.0; 
-
             window.speechSynthesis.speak(mensaje);
         }
     </script>
